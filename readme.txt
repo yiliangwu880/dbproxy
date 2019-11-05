@@ -1,10 +1,8 @@
-介绍：
-	服务器间通讯用。消息转发。
-	msg_forward的客户端，其实也是服务器，作为其他服务。
+简介：
+	db代理服务器,给业务服务器读写db（mysql,mongodb,redis）用。
 	特点：
-		多个客户端之间通讯。
-		客户端之间定义唯一id,到msg_forward注册后就可以互相通讯了。
-		客户端 之间通讯，不需要配置彼此之间的地址,只需要配置msg_forward的地址就能实现通讯。
+		部署服务器不需要你写数据库脚本创建db表，dbproxy首次连接db的时候已经为你做了。
+		当你修改db表字段时，不需要手工修改db代理服务器代码，只需要更新protobuf导出cpp文件重新编译，就支持读写新的字段。
 
 详细功能说明参考： doc.lua文件	
 
@@ -22,11 +20,9 @@ vs浏览代码：
 
 	
 目录结构：
-	mf_svr      ==msg forward server
-	mf_driver   ==msg forward client driever。 客户端驱动库
-	mf_proto	==msg forward 协议库
+	dbproxy_svr ==db代理服务器
 	bin			==执行文件
 	test 		==测试
 
-
+使用方法：
 
