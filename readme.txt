@@ -15,14 +15,23 @@
 	去目录 External里面，参考说明编译每个文件夹，生成依赖库。
 	主目录执行：sh clearBuild.sh 完成编译
 
+protobuf-3.10.1源码编译方法：
+	apt-get install autoconf automake libtool curl make g++ unzip    --安装相关工具
+	./autogen.sh
+	./configure --prefix=/home/xiaopao/test/dbproxy/external/protobuf   --设置安装目录
+	make check								--这部可能会出错，继续安装。用着没发现问题不用管了，有问题查官网
+    make install				
+	
 vs浏览代码：
 	执行.\vs\run.bat,生成sln文件
 
 	
 目录结构：
-	dbproxy_svr ==db代理服务器
-	bin			==执行文件
-	test 		==测试
+	dbproxy_svr              ==db代理服务器
+	bin			             ==执行文件
+	test 		             ==测试
+	external/protobuf        ==protobuf头文件，库，工具
+	external/protobuf-3.10.1 ==protobuf源码
 
 使用方法：
 

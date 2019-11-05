@@ -27,3 +27,8 @@ Project "dbproxy_svr"
 	
     
     
+
+Project "proto"
+	files {
+	"../proto/*.proto",
+	}
