@@ -1,6 +1,7 @@
 简介：
 	db代理服务器,给业务服务器读写db（mysql,mongodb,redis）用。
 	特点：
+		这是只是个组件模板，组件不能完全独立使用。 需要增加用户定义的表重新编译dbproxy_svr. 参考“用户使用结构描述”
 		表结构用proto文件表达。用户不需要写db读写的语句（比如sql语句）
 		首次连接db,会自动在db创建表。
 		当你修改db表字段时，不需要手工修改db代理服务器代码，只需要更新protobuf导出cpp文件重新编译，就支持读写新的字段。
@@ -28,6 +29,11 @@
 缺点：
 	依赖protobuf3
 
+用户使用结构描述：
+	dbproxy_svr 依赖: custom_proto
+	svr 依赖: svr_driver custom_proto
+	其中 custom_proto， svr需要用户自定义。
+	
 功能：
 	dbproxy_svr:
 	{

@@ -35,3 +35,14 @@ Project "proto"
 	files {
 	"../proto/*.proto",
 	}
+	
+Project "db_driver"
+	IncludeFile { 
+		"../external/",
+		"../external/protobuf/include/",
+		"../proto/",
+	}
+	files {
+		"../db_driver/src/**", 
+		"../db_driver/include/**", 
+	}

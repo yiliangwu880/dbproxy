@@ -1,83 +1,93 @@
-//option optimize_for = SPEED;
+/*
+reserved 当控制信息用，比如：
+	reserved "k_id", "i_name"; // 控制用，id == main key, name == index
+名字格式：
+k_xx : 表示xx为主键
+i_xx : 表示xx为查找索引
+*/
 
-//import "../../share_proto/db_data.proto";
-//import "./proto/db_data.proto";
-
+syntax                        = "proto3";
 package db_proto; 
 
-enum TestEnum
-{
-	T1 = 1; 
-	T2 = 2;
+import "google/protobuf/descriptor.proto";
+enum KeyOptType {
+    IndexType_NONE = 0;
+    KeyOpt1 = 155;
+    KeyOpt2 = 255;
 }
 
-message TestTable
-{		
-	optional uint64			id = 265;	
-	optional uint32			name_32 = 2;			
-	optional uint64			name_64 = 3;		
-	optional bool			name_bool = 4;	
-	optional string			name_str = 53;
-	optional bytes			name_bytes = 233;
-	optional TestEnum		name_enum = 133;	
-	optional uint64			id23 = 63;
+extend google.protobuf.FieldOptions {
+    KeyOptType KeyOpt = 51234;//51234 ;
+    string StrOpt = 51235;
+    uint32 IntOpt = 51236;
+}
 
+//消息号，请求和响应一样。
+enum Cmd
+{
+	CMD_NONE                  =0;
+	CMD_CREATE_TABLE          =1; 
+	CMD_INSERT                =2;
+	CMD_GET                   =3;
+	CMD_UPDATE                =4;
+	CMD_DEL                   =5;
 }
 
 message ReqSelectTable
 {
-	optional string			msg_name = 1;		//对应的proto消息体必须有id字段作为key
-	optional string			cond = 3;			//条件查询字符串, SQL where 后面的字符串， 例如"id=2"
-	optional uint32			limit_num = 4;		//限制查询数量 sql 的"limit num".
+
+	string			msg_name  = 1;	//proto message name
+	string			cond      = 3;	//条件查询字符串, SQL where 后面的字符串， 例如"id=2". 
+	uint32			limit_num = 4;	//限制查询数量 sql 的"limit num".
+	
+	//选用
+	string s1 = 3334 [(KeyOpt)=KeyOpt1];
+	string s2 = 333[(StrOpt)="ab"];
+	string s3 = 3333[(IntOpt)=33];
+	reserved "foo", "bar"; // 预留将来使用的filed name
 }
+
 message RspSelectTable
 {
-	optional string			msg_name = 1;		//对应的proto消息体必须有id字段作为key
-	optional bytes			data = 2;			//proto serialize data
-	optional bool			is_last = 3;		//true表示最后一条数据		
+	string			msg_name  = 1;	//对应的proto消息体必须有id字段作为key
+	bytes			data      = 2;	//proto serialize data
+	bool			is_last   = 3;	//true表示最后一条数据		
 }
 
 message ReqCreateTable
 {
-	optional string			msg_name = 1;  //对应的proto消息体必须有id字段作为key
+	string			msg_name  = 1;	//对应的proto消息体必须有id字段作为key
 }
 
 message ReqInsertData
 {
-	optional string			msg_name = 1;
-	optional bytes			data = 2;			//proto serialize data 
+	string			msg_name  = 1;
+	bytes			data      = 2;	//proto serialize data 
 }
 message RspInsertData
 {
-	optional string			msg_name = 1;
+	string			msg_name  = 1;
 }
 
 
 message ReqUpdateData
 {
-	optional string			msg_name = 1;
-	optional bytes			data = 2;			//proto serialize data 
+	string			msg_name  = 1;
+	bytes			data      = 2;	//proto serialize data 
 }
 message RsqUpdateData
 {
-	optional string			msg_name = 1;
+	string			msg_name  = 1;
 }
 
 message ReqDelData
 {
-	optional string			msg_name = 1;
-	optional string			cond = 2;			
+	string			msg_name  = 1;
+	string			cond      = 2;			
 }
 message RsqDelData
 {
-	optional string			msg_name = 1;
+	string			msg_name  = 1;
 }
 
-message TTT3
-{
-	optional uint64 id = 13;
-	optional uint32 t = 1;
-	optional uint32 t2 = 2;
-	optional string t23 = 32;
-}
 

@@ -14,10 +14,11 @@ TARGET = ./bin/dbproxy_svr
 all: $(TARGET) $(PROTO_CPP)
 	sh build_cmake.sh
 
-$(PROTO_CPP) : $(PROTO_FILE)	
-	./proto/proto_2_cpp.sh
-
+$(TARGET):$(PROTO_CPP)
 	
+#||左边的命令（command1）未执行成功, (会返回非零值),会执行exit
+$(PROTO_CPP) : $(PROTO_FILE)	
+	./proto/proto_2_cpp.sh || exit $$?;  
 	
 clean:
 	rm -f $(TARGET)

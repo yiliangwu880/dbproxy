@@ -10,9 +10,11 @@ INCLUDE_DIRECTORIES(system ../external/)
 #INCLUDE_DIRECTORIES(after  ${PROJECT_SOURCE_DIR})
 
 
+
+
 # 查找当前目录下的所有源文件
 # 并将名称保存到 DIR_SRCS 变量
-file(GLOB_RECURSE SRCS  ${PROJECT_SOURCE_DIR}/../proto/ "*.cc")
+file(GLOB_RECURSE SRCS  ${PROJECT_SOURCE_DIR} "../proto/*.cc")
 file(GLOB_RECURSE SRCS2  ${PROJECT_SOURCE_DIR} "*.cpp")
 
 # 指定生成目标

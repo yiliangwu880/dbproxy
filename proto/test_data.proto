@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+import "base.proto";
+
+package db_proto; 
+
+enum TestEnum
+{
+	TestEnum_NONE=0;
+	T1=1;
+}
+
+message TestTable
+{		
+
+	reserved "k_id", "i_name"; // 控制用，id == main key, name == index
+	uint64			id = 265;	
+	uint32			name_32 = 2;			
+	uint64			name_64 = 3;		
+	bool			name_bool = 4;	
+	string			name_str = 53;
+	bytes			name_bytes = 233;
+	TestEnum		name_enum = 133;	
+	uint64			id23 = 63;
+
+}
+
+
+message TTT3
+{
+	uint64 id = 13;
+	uint32 t = 1;
+	uint32 t2 = 2;
+	string t23 = 32;
+}
+
