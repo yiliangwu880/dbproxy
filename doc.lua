@@ -29,12 +29,21 @@
 	依赖protobuf3
 
 功能：
-	用protobuf定义表字段。
-	创建db表。
+	dbproxy_svr:
+	{
+		用protobuf定义表字段。
+		创建db表。
+		用户连接限制. 指定svr地址。（可选用）
+		兼容多种db. （先实现mysql）
+		查询,插入，更新。
+	}
+	svr_driver:
+	{
+		查询,插入，更新。
+		响应结果。
+		断线重连。
+	}
 	编译脚本，自动检查protobuf依赖关系.
-	用户连接限制. 指定svr地址。
-	兼容多种db.
-	查询：比较key.
 
 实现方法：
 	利用用protobuf3对象在C++内存是个动态对象，能知道每个字段名和值。 动态地实现dbproxy的读写。

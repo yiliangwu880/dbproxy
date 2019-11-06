@@ -5,5 +5,5 @@ mkdir -p Debug
 cd Debug
 rm * -rf
 cd ..
-sh build.sh
+make
 

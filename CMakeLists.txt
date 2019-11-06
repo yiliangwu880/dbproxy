@@ -13,9 +13,10 @@ INCLUDE(cotire)
 
 # include directories
 INCLUDE_DIRECTORIES(system ./include/)
-INCLUDE_DIRECTORIES(system ./external/libevent_cpp/External/libevent-2.1.8-stable/out/include)
+INCLUDE_DIRECTORIES(system ./external/protobuf/include/)
 INCLUDE_DIRECTORIES(after  ${PROJECT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(after  ./external)
+INCLUDE_DIRECTORIES(after  ./proto/)
 
 #运行cmake输出终端消息，调试可以用
 message(PROJECT_SOURCE_DIR_is: ${PROJECT_SOURCE_DIR})
@@ -27,6 +28,7 @@ LINK_DIRECTORIES(
 
   #项目引用第三方库
   ${PROJECT_SOURCE_DIR}/svr_driver/lib
+  ${PROJECT_SOURCE_DIR}/external/protobuf/lib
   ${PROJECT_SOURCE_DIR}/external/libevent_cpp/External/libevent-2.1.8-stable/out/lib
   ${PROJECT_SOURCE_DIR}/external/svr_util/lib
   ${PROJECT_SOURCE_DIR}/external/libevent_cpp/lib
