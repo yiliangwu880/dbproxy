@@ -16,6 +16,7 @@ Project "dbproxy_svr"
 	IncludeFile { 
 		"../external/",
 		"../external/protobuf/include/",
+		"../external/mysql_connector/include/",
 		"../proto/",
 	}
 

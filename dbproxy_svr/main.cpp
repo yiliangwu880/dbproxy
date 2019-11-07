@@ -8,7 +8,7 @@ using namespace su;
 using namespace lc;
 using namespace std;
 using namespace google::protobuf;
-using namespace db_proto;
+using namespace db;
 
 class MyLcLog : public lc::ILogPrinter, public Singleton<MyLcLog>
 {
@@ -26,127 +26,12 @@ void OnExitProccess()
 	EventMgr::Obj().StopDispatch();
 }
 namespace {
-	void t()
-	{
-		ReqSelectTable msg;
-
-		printf("------------------s11-----------------\n");
-		{
-			string v;
-			ProtoUtil::GetFieldOpt(msg, "s2", "db_proto.StrOpt", v);
-			printf("v:%s\n", v.c_str());
-		}
-		{
-			uint32 v;
-			ProtoUtil::GetFieldOpt(msg, "s3", "db_proto.IntOpt", v);
-			printf("v:%d\n", v);
-		}
-		{
-			uint32 v;
-			ProtoUtil::GetFieldOptEnum(msg, "s1", "db_proto.KeyOpt", v);
-			printf("KeyOpt:%d\n", v);
-		}
-		return;
-
-		msg.set_msg_name("a");
-		//msg debugstr:msg_name: "a"
-		printf("msg debugstr:%s\n", msg.DebugString().c_str());
-		const Descriptor *des = msg.GetDescriptor();
-	
-		{
-			const FieldDescriptor* fd = des->FindFieldByName("s1");
-			if (fd == nullptr)
-			{
-				printf("fd == nullptr");
-				return;
-			}
-			const FieldOptions& fo = fd->options();
-			//fo typename=google.protobuf.FieldOptions
-			printf("fo typename=%s\n", fo.GetTypeName().c_str());
-			const Reflection* ref = fo.GetReflection();
-			if (ref == nullptr)
-			{
-				printf("ref == nullptr\n");
-				return;
-			}
-			printf("------------------s1-----------------\n");
-			{
-				const FieldDescriptor* fd = ref->FindKnownExtensionByName("db_proto.KeyOpt");
-				if (fd == nullptr)
-				{
-					printf("FindKnownExtensionByName fd == nullptr\n");
-					return;
-				}
-				int i = ref->GetEnumValue(fo, fd);
-				printf("GetEnumValue %d \n", i);
-
-			}
-		}
-		{
-			const FieldDescriptor* fd = des->FindFieldByName("s2");
-			if (fd == nullptr)
-			{
-				printf("fd == nullptr");
-				return;
-			}
-			const FieldOptions& fo = fd->options();
-			//fo typename=google.protobuf.FieldOptions
-			printf("fo typename=%s\n", fo.GetTypeName().c_str());
-			const Reflection* ref = fo.GetReflection();
-			if (ref == nullptr)
-			{
-				printf("ref == nullptr\n");
-				return;
-			}
-			printf("------------------s1-----------------\n");
-			{
-				const FieldDescriptor* fd = ref->FindKnownExtensionByName("db_proto.StrOpt");
-				if (fd == nullptr)
-				{
-					printf("FindKnownExtensionByName fd == nullptr\n");
-					return;
-				}
-				auto v = ref->GetString(fo, fd);
-				printf("opt= %s \n", v.c_str());
-
-			}
-		}
-		{
-			const FieldDescriptor* fd = des->FindFieldByName("s3");
-			if (fd == nullptr)
-			{
-				printf("fd == nullptr");
-				return;
-			}
-			const FieldOptions& fo = fd->options();
-			//fo typename=google.protobuf.FieldOptions
-			printf("fo typename=%s\n", fo.GetTypeName().c_str());
-			const Reflection* ref = fo.GetReflection();
-			if (ref == nullptr)
-			{
-				printf("ref == nullptr\n");
-				return;
-			}
-			printf("------------------s1-----------------\n");
-			{
-				const FieldDescriptor* fd = ref->FindKnownExtensionByName("db_proto.IntOpt");
-				if (fd == nullptr)
-				{
-					printf("FindKnownExtensionByName fd == nullptr\n");
-					return;
-				}
-				auto v = ref->GetUInt32(fo, fd);
-				printf("opt= %d \n", v);
-
-			}
-		}
-	
-	}
+ 
 
 }
 int main(int argc, char* argv[])
 {
-	t();
+	ProtoUtil::Test();
 	SuMgr::Obj().Init();
 	L_COND_F(CfgMgr::Obj().Init());
 

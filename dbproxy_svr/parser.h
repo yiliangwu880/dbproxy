@@ -8,8 +8,21 @@
 class ProtoUtil
 {
 public:
+	//测试例子
+	static void Test();
 
-	static bool GetFieldOpt(const google::protobuf::Message &msg, const std::string &field_name, const std::string &opt_name, std::string &v);
-	static bool GetFieldOpt(const google::protobuf::Message &msg, const std::string &field_name, const std::string &opt_name, uint32 &v);
-	static bool GetFieldOptEnum(const google::protobuf::Message &msg, const std::string &field_name, const std::string &opt_name, uint32 &v);
+	//获取字段选项
+	static bool GetFieldOpt(const google::protobuf::Message &msg, const std::string &field_name, const std::string &opt_name, std::string &opt_value);
+	static bool GetFieldOpt(const google::protobuf::Message &msg, const std::string &field_name, const std::string &opt_name, int32 &opt_value);
+	static bool GetFieldOptEnum(const google::protobuf::Message &msg, const std::string &field_name, const std::string &opt_name, uint32 &opt_value);
+	//获取msg选项
+	static bool GetMsgOpt(const google::protobuf::Message &msg, const std::string &opt_name, std::string &opt_value);
+
+
+	static std::unique_ptr<google::protobuf::Message> CreateMessage(const std::string &msg_name);
+	static bool BuildCreateTableSql(const std::string &req, std::string &sql_str);
+	static bool CreateInsertSql(const google::protobuf::Message &msg, std::string &sql_str);
+
+private:
+	static std::string GetCreateTypeStr(google::protobuf::FieldDescriptor::Type t);
 };

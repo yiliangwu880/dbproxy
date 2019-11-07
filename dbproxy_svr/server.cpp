@@ -6,3 +6,12 @@ using namespace std;
 using namespace lc;
 using namespace google::protobuf;
 
+void InnerSvrCon::OnRecv(const MsgPack &msg)
+{
+
+}
+
+void InnerSvrCon::OnConnected()
+{
+
+}

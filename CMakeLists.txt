@@ -14,6 +14,7 @@ INCLUDE(cotire)
 # include directories
 INCLUDE_DIRECTORIES(system ./include/)
 INCLUDE_DIRECTORIES(system ./external/protobuf/include/)
+INCLUDE_DIRECTORIES(system ./external/mysql_connector/include/)
 INCLUDE_DIRECTORIES(after  ${PROJECT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(after  ./external)
 INCLUDE_DIRECTORIES(after  ./proto/)
@@ -29,6 +30,7 @@ LINK_DIRECTORIES(
   #项目引用第三方库
   ${PROJECT_SOURCE_DIR}/svr_driver/lib
   ${PROJECT_SOURCE_DIR}/external/protobuf/lib
+  ${PROJECT_SOURCE_DIR}/external/mysql_connector/lib
   ${PROJECT_SOURCE_DIR}/external/libevent_cpp/External/libevent-2.1.8-stable/out/lib
   ${PROJECT_SOURCE_DIR}/external/svr_util/lib
   ${PROJECT_SOURCE_DIR}/external/libevent_cpp/lib

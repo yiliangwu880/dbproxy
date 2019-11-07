@@ -12,8 +12,6 @@ enum TestEnum
 
 message TestTable
 {		
-
-	reserved "k_id", "i_name"; // 控制用，id == main key, name == index
 	uint64			id = 265;	
 	uint32			name_32 = 2;			
 	uint64			name_64 = 3;		

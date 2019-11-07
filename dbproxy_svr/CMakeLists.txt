@@ -10,8 +10,6 @@ INCLUDE_DIRECTORIES(system ../external/)
 #INCLUDE_DIRECTORIES(after  ${PROJECT_SOURCE_DIR})
 
 
-
-
 # 查找当前目录下的所有源文件
 # 并将名称保存到 DIR_SRCS 变量
 file(GLOB_RECURSE SRCS  ${PROJECT_SOURCE_DIR} "../proto/*.cc")
@@ -24,5 +22,5 @@ ADD_EXECUTABLE(${project_name} ${SRCS} ${SRCS2})
 #ADD_DEPENDENCIES(${project_name} svr_util libevent_cpp)
 
 # 设置链接库
-target_link_libraries(${project_name} svr_util libevent_cpp libevent.a libprotobuf.a)
+target_link_libraries(${project_name} svr_util libevent_cpp libevent.a libprotobuf.a libmysqlcppconn-static.a)
 
