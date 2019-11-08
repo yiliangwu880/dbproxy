@@ -13,14 +13,14 @@ class MysqlCon : public IDbCon
 public:
 	virtual ~MysqlCon();
 
-	virtual bool ConnectDb();
+	virtual bool ConnectDb(const Cfg &cfg) override;
 
-	virtual void InitTable(const std::string &msg_name); //如果表存在，测不会再创建
-	virtual bool Insert(const db::ReqInsertData &req);
-	virtual bool Update(const db::ReqUpdateData &req);
-	virtual bool Get(const db::ReqGetData &req, db::RspGetData &rsp);
-	virtual bool Del(const db::ReqDelData &req, db::RspDelData &rsp);
-	virtual bool ExecuteSql(const std::string &sql_str);
+	virtual bool InitTable(const db::ReqInitTable &req, db::RspInitTable &rsp) override; //创建表， 检查表是否非法
+	virtual bool Insert(const db::ReqInsertData &req) override;
+	virtual bool Update(const db::ReqUpdateData &req) override;
+	virtual bool Get(const db::ReqGetData &req, db::RspGetData &rsp) override;
+	virtual bool Del(const db::ReqDelData &req, db::RspDelData &rsp) override;
+	virtual bool ExecuteSql(const std::string &sql_str) override;
 
 private:
 	void SetInsertPreparePara(sql::PreparedStatement &pstmt, google::protobuf::Message &msg);
@@ -36,9 +36,5 @@ private:
 	bool CreateInsertSql(const google::protobuf::Message &msg, std::string &sql_str);
 
 private:
-	std::string m_ip;
-	std::string m_user;
-	std::string m_psw;
-	std::string m_db_name;
 	sql::Connection* m_con = nullptr;
 };

@@ -4,15 +4,14 @@
 
 #pragma once
 #include "base_include.h"
-#include "cpp_cfg/CC_cfg.h"
+#include "cpp_cfg/CC_Cfg.h"
 
 class CfgMgr : public Singleton<CfgMgr>
 {
 public:
-	CfgMgr() {};
 	bool Init();
+	const Cfg &GetCfg() const { return m_cfg; }
 
-	const cfg GetCfg() const { return m_cfg; }
 private:
-	cfg m_cfg;
+	Cfg m_cfg;
 };

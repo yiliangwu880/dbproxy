@@ -3,11 +3,14 @@
 #include "google/protobuf/message.h"
 #include "base.pb.h"
 #include "db_con.h"
+#include "parser.h"
 
 using namespace std;
 using namespace lc;
 using namespace google::protobuf;
 using namespace db;
+
+using UINT64 =::uint64;
 
 namespace
 {
@@ -15,7 +18,7 @@ namespace
 	template<class T>
 	void ParseCp(T &dst, const char *&src)
 	{
-		dst = (decltype(dst))(*src); // ¿‡À∆ dst = (uint32 &)(*src)
+		dst = *(T *)(src); // ¿‡À∆ dst = *(uint32 *)(src)
 		src = src + sizeof(dst);
 	}
 }
@@ -24,7 +27,9 @@ void InnerSvrCon::Handle_CMD_INIT_TABLE(const char *msg, uint16 msg_len)
 {
 	ReqInitTable req;
 	L_COND(req.ParseFromArray(msg, msg_len), "msg parse fail");
-
+	IDbCon &db_con = DbConMgr::Obj().GetCon();
+	RspInitTable rsp;
+	db_con.InitTable(req, rsp);
 }
 
 void InnerSvrCon::Handle_CMD_INSERT(const char *msg, uint16 msg_len)
@@ -34,8 +39,18 @@ void InnerSvrCon::Handle_CMD_INSERT(const char *msg, uint16 msg_len)
 	IDbCon &db_con = DbConMgr::Obj().GetCon();
 	RspInsertData rsp;
 	rsp.set_msg_name(req.msg_name());
-	rsp.set_is_ok(db_con.Insert(req));
+	UINT64 num_key;
+	string str_key;
+	if (!ProtoUtil::GetMsgMainKeyVal(req, num_key, str_key))
+	{
+		L_WARN("illegal message %s. no main key. ", req.msg_name().c_str());
+		Send(rsp);
+		return;
+	}
+	rsp.set_num_key(num_key);
+	rsp.set_str_key(str_key);
 
+	rsp.set_is_ok(db_con.Insert(req));
 	Send(rsp);
 }
 
@@ -97,7 +112,7 @@ void InnerSvrCon::OnRecv(const MsgPack &msg_pack)
 
 void InnerSvrCon::OnConnected()
 {
-
+	L_DEBUG("svr connect");
 }
 
 void InnerSvrCon::Send(const google::protobuf::Message &msg)

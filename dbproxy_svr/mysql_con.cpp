@@ -38,13 +38,15 @@ namespace
 	}
 }
 
-void MysqlCon::InitTable(const std::string &msg_name)
+bool MysqlCon::InitTable(const ReqInitTable &req, RspInitTable &rsp)
 {
+	rsp.Clear();
+	const std::string &msg_name = req.msg_name(0);
 	try {
 		if (nullptr == m_con)
 		{
 			L_ERROR("nullptr == m_con");
-			return;
+			return false;
 		}
 		std::auto_ptr<sql::PreparedStatement> pstmt;
 
@@ -52,7 +54,7 @@ void MysqlCon::InitTable(const std::string &msg_name)
 		if (!BuildCreateTableSql(msg_name, sql_str))
 		{
 			L_ERROR("CreateSql fail");
-			return;
+			return false;
 		}
 
 		//sql Ä£°å
@@ -66,12 +68,14 @@ void MysqlCon::InitTable(const std::string &msg_name)
 		if (0 != affect_row)
 		{
 			L_ERROR("create table fail. row=%d, table name[%s]", affect_row, msg_name.c_str());
-			return;
+			return false;
 		}
+		rsp.set_is_ok(true);
+		return true;
 	}
 	catch (sql::SQLException &e) {
 		L_ERROR("%s, MySQL error code:%d, SQLState:%s", e.what(), e.getErrorCode(), e.getSQLStateCStr());
-		return;
+		return false;
 	}
 }
 
@@ -312,21 +316,22 @@ MysqlCon::~MysqlCon()
 	}
 }
 
-bool MysqlCon::ConnectDb()
+bool MysqlCon::ConnectDb(const Cfg &cfg)
 {
 	sql::Driver* driver = NULL;
 	try {
 		driver = sql::mysql::get_driver_instance();
-
+		auto mysql_db = cfg.mysql_db;
 		sql::ConnectOptionsMap connection_properties;
-		connection_properties["hostName"] = m_ip;
-		connection_properties["userName"] = m_user;
-		connection_properties["password"] = m_psw;
+		connection_properties["hostName"] = mysql_db.db_ip;
+		connection_properties["port"] = mysql_db.db_port;
+		connection_properties["userName"] = mysql_db.db_user;
+		connection_properties["password"] = mysql_db.db_psw;
 		connection_properties["OPT_RECONNECT"] = true;
 
-		L_DEBUG("try connect mysql db[%s]. this may need a few minute!", m_user.c_str());
+		L_DEBUG("try connect mysql db[%s]. this may need a few minute!", mysql_db.db_user.c_str());
 		m_con = driver->connect(connection_properties);
-		m_con->setSchema(m_db_name);
+		m_con->setSchema(mysql_db.db_name);
 		L_DEBUG("connect mysql db ok");
 		return true;
 	}

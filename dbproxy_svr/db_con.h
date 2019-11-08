@@ -1,33 +1,18 @@
 /*
- 管理连接db客户端
+ 管理连接db客户端,抽象成，兼容mysql， mongodb
 */
 
 #pragma once
 #include "base_include.h"
-
-enum class DBType
-{
-	MYSQL,
-	MONGODB,
-};
-
-struct DbCfg 
-{
-	DBType type; 
-	std::string ip;
-	std::string user;
-	std::string psw;
-	std::string db_name;
-};
 
 class IDbCon
 {
 public:
 	virtual ~IDbCon() {};
 
-	virtual bool ConnectDb() { return false; };
+	virtual bool ConnectDb(const Cfg &cfg) { return false; };
 
-	virtual void InitTable(const std::string &msg_name) {}; //如果表存在，测不会再创建
+	virtual bool InitTable(const db::ReqInitTable &req, db::RspInitTable &rsp) {return false;}; //创建表， 检查表是否非法
 	virtual bool Insert(const db::ReqInsertData &req) { return false; };
 	virtual bool Update(const db::ReqUpdateData &req) { return false; };
 	virtual bool Get(const db::ReqGetData &req, db::RspGetData &rsp) { return false; };
@@ -37,24 +22,18 @@ public:
 };
 
 //管理连接db客户端
-class DbConMgr: public Singleton<DbConMgr>
+class DbConMgr : public Singleton<DbConMgr>
 {
 
 public:
-	DbConMgr()
-		:m_con(nullptr)
-	{
-	}
-	bool Init(const DbCfg &cfg);
+	DbConMgr() {}
+	~DbConMgr();
+	bool Init(const Cfg &cfg);
 
 	IDbCon &GetCon();
 
 private:
-	IDbCon *m_con;
+	IDbCon *m_con=nullptr;
 };
 
-class MongodbConn : public IDbCon
-{
-
-};
 

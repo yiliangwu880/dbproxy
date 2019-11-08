@@ -14,10 +14,10 @@ INCLUDE_DIRECTORIES(after  ./cpp_cfg/com/)
 # 并将名称保存到 DIR_SRCS 变量
 file(GLOB_RECURSE SRCS  ${PROJECT_SOURCE_DIR} "../proto/*.cc")
 file(GLOB_RECURSE SRCS2  ${PROJECT_SOURCE_DIR} "*.cpp")
-file(GLOB_RECURSE SRCS3  ${PROJECT_SOURCE_DIR} "./cpp_cfg/com/*.cpp")
+#file(GLOB_RECURSE SRCS3  ${PROJECT_SOURCE_DIR} "./cpp_cfg/com/*.cpp")
 
 # 指定生成目标
-ADD_EXECUTABLE(${project_name} ${SRCS} ${SRCS2} ${SRCS3})
+ADD_EXECUTABLE(${project_name} ${SRCS} ${SRCS2})
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../bin/dbproxy_svr/)
 #设置依赖
 #ADD_DEPENDENCIES(${project_name} svr_util libevent_cpp)

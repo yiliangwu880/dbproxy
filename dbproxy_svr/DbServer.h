@@ -5,8 +5,7 @@ class InnerSvrCon : public lc::SvrCon
 {
 	db::Cmd m_cur_cmd=db::CMD_NONE;
 public:
-	InnerSvrCon()
-	{}
+	InnerSvrCon(){}
 	void Handle_CMD_INIT_TABLE(const char *msg, uint16 msg_len);
 	void Handle_CMD_INSERT(const char *msg, uint16 msg_len);
 	void Handle_CMD_UPDATE(const char *msg, uint16 msg_len);
