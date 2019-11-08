@@ -20,9 +20,4 @@ public:
 
 
 	static std::unique_ptr<google::protobuf::Message> CreateMessage(const std::string &msg_name);
-	static bool BuildCreateTableSql(const std::string &req, std::string &sql_str);
-	static bool CreateInsertSql(const google::protobuf::Message &msg, std::string &sql_str);
-
-private:
-	static std::string GetCreateTypeStr(google::protobuf::FieldDescriptor::Type t);
 };

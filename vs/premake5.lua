@@ -18,11 +18,13 @@ Project "dbproxy_svr"
 		"../external/protobuf/include/",
 		"../external/mysql_connector/include/",
 		"../proto/",
+		"./cpp_cfg/com/",
 	}
 
 	SrcPath { 
 		"../dbproxy_svr/**",  --**递归所有子目录，指定目录可用 "cc/*.cpp" 或者  "cc/**.cpp"
 		"../proto/**",
+		"./cpp_cfg/**",
 	}
 	files {
 	"../*.txt",

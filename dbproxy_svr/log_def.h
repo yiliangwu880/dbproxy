@@ -66,6 +66,7 @@
 	do{\
 	if(!(cond)){\
 	su::LogMgr::Obj().Printf(su::LL_ERROR, __FILE__, __LINE__, __FUNCTION__, "assert error"); \
+	*(int *)(nullptr) = 1;\
 	}	\
 	}while(0);
 

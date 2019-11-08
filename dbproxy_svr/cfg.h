@@ -4,24 +4,15 @@
 
 #pragma once
 #include "base_include.h"
-
+#include "cpp_cfg/CC_cfg.h"
 
 class CfgMgr : public Singleton<CfgMgr>
 {
 public:
-	CfgMgr();
+	CfgMgr() {};
 	bool Init();
 
-	unsigned short GetInnerPort() const { return m_inner_port; }
-	const char *GetInnerIp() const { return m_inner_ip.c_str(); }
-	unsigned short GetExPort() const { return m_ex_port; }
-	const char *GetExIp() const { return m_ex_ip.c_str(); }
-	bool IsDaemon()const { return is_daemon; }
+	const cfg GetCfg() const { return m_cfg; }
 private:
-	unsigned short m_inner_port;
-	std::string m_inner_ip;
-	//外网地址，给client连接用
-	unsigned short m_ex_port;
-	std::string m_ex_ip;
-	bool is_daemon;
+	cfg m_cfg;
 };
