@@ -12,8 +12,8 @@ enum TestEnum
 
 message TestTable
 {		
-	uint64			id = 265;	
-	uint32			name_32 = 2;			
+	uint64			id = 265 [(db.OptKey)=K_MAIN_KEY];	
+	uint32			name_32 = 2 [(db.OptKey)=K_INDEX];			
 	uint64			name_64 = 3;		
 	bool			name_bool = 4;	
 	string			name_str = 53;

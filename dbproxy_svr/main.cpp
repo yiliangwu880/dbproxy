@@ -21,39 +21,79 @@ public:
 	}
 };
 
-
-void OnExitProccess()
+//base application
+class BaseApp
 {
-	L_DEBUG("OnExitProccess");
-	EventMgr::Obj().StopDispatch();
-}
-namespace {
- 
+public:
+	void Start(int argc, char* argv[], const string &app_name, bool is_daemon);
+	virtual void OnStart() = 0;
+	void Stop();
+private:
+	static void OnExitProccess();
+};
 
-}
-int main(int argc, char* argv[])
+void BaseApp::Start(int argc, char* argv[], const string &app_name, bool is_daemon)
 {
-//	ProtoUtil::Test();
-	SuMgr::Obj().Init();
-	L_COND_F(CfgMgr::Obj().Init());
-	const Cfg &cfg = CfgMgr::Obj().GetCfg();
-	if (cfg.is_daemon)
+	if (is_daemon)
 	{
 		//当nochdir为0时，daemon将更改进城的根目录为root(“ / ”)。
 		//当noclose为0是，daemon将进城的STDIN, STDOUT, STDERR都重定向到 / dev / null。
-		L_COND_F(0==daemon(1, 0));
+		if (0 != daemon(1, 0))
+		{
+			printf("daemon fail\n");
+			return;
+		}
 	}
+	SuMgr::Obj().Init();
 
 	//start or stop proccess
-	SPMgr::Obj().Check(argc, argv, "acc_svr", OnExitProccess);
+	SPMgr::Obj().Check(argc, argv, app_name.c_str(), BaseApp::OnExitProccess);
 
 	EventMgr::Obj().Init(&MyLcLog::Obj());
 
-	DbConMgr::Obj().Init(cfg);
-	DbServer::Obj().Init(cfg.port, cfg.ip.c_str());
+	OnStart();
 
 	EventMgr::Obj().Dispatch();
 	L_INFO("main end");
+}
+
+
+void BaseApp::Stop()
+{
+	EventMgr::Obj().StopDispatch();
+}
+
+void BaseApp::OnExitProccess()
+{
+	L_INFO("OnExitProccess");
+	EventMgr::Obj().StopDispatch();
+}
+
+class MyApp: public BaseApp
+{
+public:
+	virtual void OnStart() override
+	{
+		const Cfg &cfg = CfgMgr::Obj().GetCfg();
+		DbConMgr::Obj().Init(cfg);
+		DbServer::Obj().Init(cfg.port, cfg.ip.c_str());
+	}
+
+private:
+};
+
+
+int main(int argc, char* argv[])
+{
+	if (!CfgMgr::Obj().Init())
+	{
+		printf("read cfg fail!");
+		return 0;
+	}
+	const Cfg &cfg = CfgMgr::Obj().GetCfg();
+
+	MyApp app;
+	app.Start(argc, argv, "dbproxy_svr", cfg.is_daemon);
 	return 0;
 }
 

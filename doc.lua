@@ -87,7 +87,11 @@
 	msg 具体消息内容，protobuf结构。
 
 
+mysql proto格式：
+	不支持repeated字段，
+	支持Message字段，数据库会转换成blob字段，不能直接用查看内容。
 
+mongodb proto格式
 	
 
 	

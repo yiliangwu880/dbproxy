@@ -16,29 +16,29 @@ enum KeyType {
 
 extend google.protobuf.MessageOptions 
 {
-    string MsgOpt = 50001;
+    string OptMsg = 50001;
 }
 
 extend google.protobuf.FieldOptions {
-    KeyType KeyOpt = 50001;//由些例子用51234，还未查明原因，以后有问题再研究protobuf手册 ;
-    string StrOpt  = 50002;
-    int32 IntOpt   = 50003;
+    KeyType OptKey = 50001;//由些例子用51234，还未查明原因，以后有问题再研究protobuf手册 ;
+    string OptStr  = 50002;
+    int32 OptInt   = 50003;
 }
 ////////////////////custom option define end///////////////
 
 //测试例子
 message TestMsg
 {
-	option (MsgOpt)="my_msg_opt";
+	option (OptMsg)="my_msg_opt";
 
 	string	msg_name  = 1;	//proto message name
 	string	cond      = 3;	//条件查询字符串, SQL where 后面的字符串， 例如"id=2". 
 	uint32	limit_num = 4;	//限制查询数量 sql 的"limit num".
 	
 	//选用
-	string id = 3334 [(KeyOpt)=K_MAIN_KEY];
-	string s2 = 333 [(StrOpt)="abc"];
-	string s3 = 3333 [(IntOpt)=333];
+	string id = 3334 [(OptKey)=K_MAIN_KEY];
+	string s2 = 333 [(OptStr)="abc"];
+	string s3 = 3333 [(OptInt)=333];
 }
 
 
@@ -99,8 +99,8 @@ message ReqGetData
 message RspGetData
 {
 	string		msg_name  = 1;	//对应的proto消息体必须有id字段作为key
-	bytes		data      = 2;	//proto serialize data
-	bool		is_last   = 3;	//true表示最后一条数据		
+	repeated bytes	data  = 2;	//proto serialize data
+	bool		is_last   = 3;	//true表示获得最后一条数据		
 }
 
 message ReqDelData

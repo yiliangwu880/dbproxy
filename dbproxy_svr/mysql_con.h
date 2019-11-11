@@ -24,16 +24,14 @@ public:
 
 private:
 	void SetInsertPreparePara(sql::PreparedStatement &pstmt, google::protobuf::Message &msg);
-
 	void SetUpdatePreparePara(sql::PreparedStatement &pstmt, google::protobuf::Message &msg);
-
-	bool CreateUpdateSql(const google::protobuf::Message &msg, std::string &sql_str);
 	bool SetField(google::protobuf::Message& msg, const google::protobuf::FieldDescriptor &field, const sql::ResultSet& res);
-
-	bool BuildCreateTableSql(const std::string &msg_name, std::string &sql_str);
-
-	std::string GetCreateTypeStr(google::protobuf::FieldDescriptor::Type t);
+	
+	bool TryCreateTableSql(const std::string &msg_name, std::string &sql_str);
 	bool CreateInsertSql(const google::protobuf::Message &msg, std::string &sql_str);
+	bool CreateUpdateSql(const google::protobuf::Message &msg, std::string &sql_str);
+	void CreateSelectSql(const db::ReqGetData &req, const std::string &table_name, std::string &sql_str);
+	std::string GetCreateTypeStr(google::protobuf::FieldDescriptor::Type t);
 
 private:
 	sql::Connection* m_con = nullptr;
