@@ -38,13 +38,14 @@ bool MysqlCon::InitTable(const ReqInitTable &req, RspInitTable &rsp)
 	{
 		try {
 			string sql_str;
+			L_DEBUG("TryCreateTableSql msg_name=%s", msg_name.c_str());
 			if (!TryCreateTableSql(msg_name, sql_str))
 			{
 				L_ERROR("CreateSql fail");
 				return false;
 			}
 
-			//LOG_DEBUG("create sql=%s", sql_str.c_str());
+			L_DEBUG("create sql=%s", sql_str.c_str());
 			std::unique_ptr<sql::PreparedStatement> pstmt(m_con->prepareStatement(sql_str));
 			int affect_row = pstmt->executeUpdate();
 			if (0 != affect_row)
@@ -62,7 +63,7 @@ bool MysqlCon::InitTable(const ReqInitTable &req, RspInitTable &rsp)
 	return true;
 }
 
-bool MysqlCon::Insert(const db::ReqInsertData &req)
+bool MysqlCon::Insert(const db::ReqInsertData &req, ::uint64 &num_key, std::string &str_key)
 {
 	L_COND_F(m_con);
 	unique_ptr<google::protobuf::Message> msg = ProtoUtil::CreateMessage(req.msg_name());
@@ -72,6 +73,13 @@ bool MysqlCon::Insert(const db::ReqInsertData &req)
 		return false;
 	}
 	L_COND_F(msg->ParseFromString(req.data()), "parse msg fail. msg_name = %s", req.msg_name().c_str());
+
+	if (!ProtoUtil::GetMsgMainKeyVal(*msg, num_key, str_key))
+	{
+		L_WARN("illegal message %s. no main key. ", req.msg_name().c_str());
+		return false;
+	}
+
 	//LOG_DEBUG("msg content=%s", msg->DebugString().c_str());
 	try {
 		string sql_str;
@@ -94,7 +102,7 @@ bool MysqlCon::Insert(const db::ReqInsertData &req)
 	}
 }
 
-bool MysqlCon::Update(const db::ReqUpdateData &req)
+bool MysqlCon::Update(const db::ReqUpdateData &req, ::uint64 &num_key, std::string &str_key)
 {
 	L_COND_F(m_con);
 	unique_ptr<google::protobuf::Message> msg = ProtoUtil::CreateMessage(req.msg_name());
@@ -103,7 +111,13 @@ bool MysqlCon::Update(const db::ReqUpdateData &req)
 		L_ERROR("create message fail. name=%s", req.msg_name().c_str());
 		return false;
 	}
-	msg->ParseFromString(req.data());
+	L_COND_F(msg->ParseFromString(req.data()), "parse msg fail. msg_name = %s", req.msg_name().c_str());
+	if (!ProtoUtil::GetMsgMainKeyVal(*msg, num_key, str_key))
+	{
+		L_WARN("illegal message %s. no main key. ", req.msg_name().c_str());
+		return false;
+	}
+
 	try {
 		string sql_str;
 		if (!CreateUpdateSql(*msg, sql_str))
@@ -111,7 +125,7 @@ bool MysqlCon::Update(const db::ReqUpdateData &req)
 			L_ERROR("create update sql fail");
 			return false;
 		}
-		//LOG_DEBUG("create update sql=%s", sql_str.c_str());
+		L_DEBUG("create update sql=%s", sql_str.c_str());
 		unique_ptr< sql::PreparedStatement > pstmt(m_con->prepareStatement(sql_str));
 		SetUpdatePreparePara(*pstmt, *msg);
 		int affect_row = pstmt->executeUpdate();
@@ -258,19 +272,16 @@ namespace
 		case FieldDescriptor::TYPE_MESSAGE:
 		{
 			Message* chiledMsg = rfl->MutableMessage(&msg, &field);
-			char str[MAX_SQL_STR_SIZE];
-			bool r = chiledMsg->SerializeToArray(str, sizeof(str));
-			if (!r)
-			{
-				L_ERROR("SerializeToArray fail");
-				break;
-			}
+			L_COND(chiledMsg);
+			string s = chiledMsg->SerializeAsString();
+			pstmt.setString(idx, s);
 
-			DataBuf buffer;
-			std::istream blobStream(&buffer);
-			buffer.InitBuf(str, chiledMsg->ByteSize());
-			blobStream.rdbuf(&buffer);
-			pstmt.setBlob(idx, &blobStream);
+
+			//DataBuf buffer;
+			//std::istream blobStream(&buffer);
+			//buffer.InitBuf(str, chiledMsg->ByteSize());
+			//blobStream.rdbuf(&buffer);
+			//pstmt.setBlob(idx, &blobStream);
 			break;
 		}
 		} //end switch (field.type())
@@ -315,7 +326,8 @@ bool MysqlCon::ConnectDb(const Cfg &cfg)
 		connection_properties["password"]      = mysql_db.db_psw;
 		connection_properties["OPT_RECONNECT"] = true;
 
-		L_DEBUG("try connect mysql db[%s]. this may need a few minute!", mysql_db.db_user.c_str());
+		L_DEBUG("try connect mysql db[%s].\n %s %d this may need a few minute!", mysql_db.db_user.c_str()
+			, mysql_db.db_ip.c_str(), mysql_db.db_port);
 		sql::Driver* driver = sql::mysql::get_driver_instance();
 		m_con = driver->connect(connection_properties);
 		m_con->setSchema(mysql_db.db_name);
@@ -364,27 +376,29 @@ bool MysqlCon::TryCreateTableSql(const std::string &msg_name, std::string &sql_s
 			L_ERROR("not support repeated field");
 			return false;
 		}
+		
+		sql_str += "`";
+		sql_str += field->name();
+		sql_str += "` ";
+
+		KeyType key_type;
+		bool is_unique = false; 
 		{
-			sql_str += "`";
-			sql_str += field->name();
-			sql_str += "` ";
-			sql_str += GetCreateTypeStr(field->type());
-			sql_str += ",";
-		}
-		//L_DEBUG("check field[%s]", field->name().c_str());
-		//find key
-		{
-			KeyType key_type;
 			ProtoUtil::GetFieldKeyOpt(*des, field->name(), key_type);
 			if (db::K_MAIN_KEY == key_type)
 			{
 				main_key = field->name();
+				is_unique = true;
 			}
 			else if (db::K_INDEX == key_type)
 			{
 				index_key.push_back(field->name());
+				is_unique = true;
 			}
 		}
+		sql_str += GetCreateTypeStr(field->type(), is_unique);
+		sql_str += ",";
+		
 	}
 	if (main_key.empty())
 	{
@@ -516,6 +530,7 @@ void MysqlCon::SetUpdatePreparePara(sql::PreparedStatement &pstmt, google::proto
 	int cnt = des->field_count();
 	L_COND(cnt>=1);
 
+	int idx = 1;
 	for (int i = 0; i < cnt; i++)
 	{
 		const FieldDescriptor* field = des->field(i);
@@ -530,7 +545,8 @@ void MysqlCon::SetUpdatePreparePara(sql::PreparedStatement &pstmt, google::proto
 		{
 			continue;
 		}
-		SetFieldParam(msg, *field, pstmt, i+1);
+		SetFieldParam(msg, *field, pstmt, idx);
+		idx++;
 	}
 
 	return;
@@ -661,6 +677,8 @@ bool MysqlCon::Del(const db::ReqDelData &req, db::RspDelData &rsp)
 {
 	rsp.Clear();
 	rsp.set_msg_name(req.msg_name());
+	rsp.set_num_key(req.num_key());
+	rsp.set_str_key(req.str_key());
 	L_COND_F(m_con);
 	L_COND_F(!req.cond().empty());
 
@@ -752,16 +770,19 @@ bool MysqlCon::CreateInsertSql(const google::protobuf::Message &msg, std::string
 	return true;
 }
 
-std::string MysqlCon::GetCreateTypeStr(FieldDescriptor::Type t)
+std::string MysqlCon::GetCreateTypeStr(FieldDescriptor::Type t, bool is_unique)
 {
+	string s;
 	switch (t)
 	{
 	default:
 		L_ERROR("unknow type %d", (int)t);
-		return "unknow type";
+		s="unknow type";
+		break;
 	case FieldDescriptor::TYPE_DOUBLE:
 	case FieldDescriptor::TYPE_FLOAT:
-		return "double NULL DEFAULT NULL";
+		s = "double";
+		break;
 	case FieldDescriptor::TYPE_INT64:
 	case FieldDescriptor::TYPE_SINT64:
 	case FieldDescriptor::TYPE_SFIXED64:
@@ -769,17 +790,29 @@ std::string MysqlCon::GetCreateTypeStr(FieldDescriptor::Type t)
 	case FieldDescriptor::TYPE_FIXED64:
 	case FieldDescriptor::TYPE_FIXED32:
 	case FieldDescriptor::TYPE_UINT32:
-		return "bigint(20) NULL DEFAULT NULL";
+		s = "bigint(20)";
+		break;
 	case FieldDescriptor::TYPE_INT32:
 	case FieldDescriptor::TYPE_ENUM:
 	case FieldDescriptor::TYPE_SFIXED32:
 	case FieldDescriptor::TYPE_SINT32:
 	case FieldDescriptor::TYPE_BOOL:
-		return "int(11) NULL DEFAULT NULL";
+		s = "int(11)";
+		break;
 	case FieldDescriptor::TYPE_STRING:
-		return "varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL";
+		s = "varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci";
+		break;
 	case FieldDescriptor::TYPE_MESSAGE:
 	case FieldDescriptor::TYPE_BYTES:
-		return "blob NULL";
+		s = "blob NULL";
+		break;
+	}
+	if (is_unique)
+	{
+		return s;
+	} 
+	else
+	{
+		return s + " NULL DEFAULT NULL";
 	}
 }

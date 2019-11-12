@@ -28,7 +28,7 @@ LINK_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/lib
 
   #项目引用第三方库
-  ${PROJECT_SOURCE_DIR}/svr_driver/lib
+  ${PROJECT_SOURCE_DIR}/db_driver/lib
   ${PROJECT_SOURCE_DIR}/external/protobuf/lib
   ${PROJECT_SOURCE_DIR}/external/mysql_connector/lib
   ${PROJECT_SOURCE_DIR}/external/libevent_cpp/External/libevent-2.1.8-stable/out/lib
@@ -59,6 +59,8 @@ SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 #SET(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib)
 
 ADD_SUBDIRECTORY(dbproxy_svr)
+ADD_SUBDIRECTORY(db_driver)
+ADD_SUBDIRECTORY(test)
 
 #自定义命令
 ##################################

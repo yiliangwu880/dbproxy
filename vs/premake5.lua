@@ -48,4 +48,22 @@ Project "db_driver"
 	files {
 		"../db_driver/src/**", 
 		"../db_driver/include/**", 
+		"../db_driver/*.txt", 
 	}
+	
+Project "test_mysql"
+	IncludeFile { 
+		"../external/",
+		"../external/protobuf/include/",
+		"../proto/",
+	}
+	files {
+		"../test/test_mysql/**", 
+		"../test/com/**", 
+		"../test/test_mysql/*.txt", 
+	}
+
+
+
+
+

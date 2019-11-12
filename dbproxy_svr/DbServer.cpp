@@ -30,6 +30,7 @@ void InnerSvrCon::Handle_CMD_INIT_TABLE(const char *msg, uint16 msg_len)
 	L_COND(req.ParseFromArray(msg, msg_len), "msg parse fail");
 	RspInitTable rsp;
 	db_con.InitTable(req, rsp);
+	Send(rsp);
 }
 
 void InnerSvrCon::Handle_CMD_INSERT(const char *msg, uint16 msg_len)
@@ -37,19 +38,14 @@ void InnerSvrCon::Handle_CMD_INSERT(const char *msg, uint16 msg_len)
 	IDbCon &db_con = DbConMgr::Obj().GetCon();
 	ReqInsertData req;
 	L_COND(req.ParseFromArray(msg, msg_len), "msg parse fail");
-	RspInsertData rsp;
-	rsp.set_msg_name(req.msg_name());
 	UINT64 num_key;
 	string str_key;
-	if (!ProtoUtil::GetMsgMainKeyVal(req, num_key, str_key))
-	{
-		L_WARN("illegal message %s. no main key. ", req.msg_name().c_str());
-		Send(rsp);
-		return;
-	}
+	bool r = db_con.Insert(req, num_key, str_key);
+	RspInsertData rsp;
+	rsp.set_msg_name(req.msg_name());
 	rsp.set_num_key(num_key);
 	rsp.set_str_key(str_key);
-	rsp.set_is_ok(db_con.Insert(req));
+	rsp.set_is_ok(r);
 	Send(rsp);
 }
 
@@ -58,19 +54,14 @@ void InnerSvrCon::Handle_CMD_UPDATE(const char *msg, uint16 msg_len)
 	IDbCon &db_con = DbConMgr::Obj().GetCon();
 	ReqUpdateData req;
 	L_COND(req.ParseFromArray(msg, msg_len), "msg parse fail");
-	RspUpdateData rsp;
-	rsp.set_msg_name(req.msg_name());
 	UINT64 num_key;
 	string str_key;
-	if (!ProtoUtil::GetMsgMainKeyVal(req, num_key, str_key))
-	{
-		L_WARN("illegal message %s. no main key. ", req.msg_name().c_str());
-		Send(rsp);
-		return;
-	}
+	bool r = db_con.Update(req, num_key, str_key);
+	RspUpdateData rsp;
+	rsp.set_msg_name(req.msg_name());
 	rsp.set_num_key(num_key);
 	rsp.set_str_key(str_key);
-	rsp.set_is_ok(db_con.Update(req));
+	rsp.set_is_ok(r);
 	Send(rsp);
 }
 

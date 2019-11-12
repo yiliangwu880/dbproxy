@@ -76,6 +76,7 @@ public:
 	{
 		const Cfg &cfg = CfgMgr::Obj().GetCfg();
 		DbConMgr::Obj().Init(cfg);
+		L_INFO("dbproxy_svr svr addr:%s %d", cfg.ip.c_str(), cfg.port);
 		DbServer::Obj().Init(cfg.port, cfg.ip.c_str());
 	}
 

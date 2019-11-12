@@ -79,7 +79,6 @@
 		proto msg 不匹配 通知。
 		断线重连。
 	}
-	编译脚本，自动检查protobuf依赖关系.
 
 协议：
 	svr和dbproxy通讯包结构：cmd,msg

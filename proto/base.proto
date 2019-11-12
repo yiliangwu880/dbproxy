@@ -52,6 +52,7 @@ enum Cmd
 	CMD_UPDATE        =3; //ReqUpdateData
 	CMD_GET           =4; //ReqGetData
 	CMD_DEL           =5; //ReqDelData
+	CMD_SQL           =6; //ReqSql
 }
 
 message ReqInitTable
@@ -61,7 +62,6 @@ message ReqInitTable
 message RspInitTable
 {
 	bool is_ok = 1;
-	bool is_wrong_format = 2;//true 表示proto定义的表和db已存在的表格式不匹配。
 }
 
 message ReqInsertData
@@ -105,15 +105,25 @@ message RspGetData
 
 message ReqDelData
 {
-	string			msg_name  = 1;
-	string			cond      = 2;			
+	string		msg_name  = 1;
+	string		cond      = 2;		
+	uint64		num_key	  = 4;	 //数据的主键, 可选用， 不影响操作
+	string		str_key	  = 5;   //数据的主键, 可选用， 不影响操作
 }
 message RspDelData
 {
 	string		msg_name  = 1;
 	uint32		del_num   = 2;  //删除多少项数据, 0表示失败
-	uint64		num_key	  = 4;	//数据的主键，如果 主键是数字 才有用
-	string		str_key	  = 5;  //数据的主键，如果 主键是字符串 才有用
+	uint64		num_key	  = 4;	//数据的主键，和请求一样
+	string		str_key	  = 5;  //数据的主键，和请求一样
 }
 
+message ReqSql
+{
+	string exe_str  = 1;
+}
+message RspSql
+{
+	bool is_ok = 1;
+}
 
