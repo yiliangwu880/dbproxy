@@ -57,11 +57,10 @@ bool db::BaseDbproxy::Get(const std::string &msg_name, const std::string &cond, 
 	return m_con.Send(CMD_GET, req);
 }
 
-bool db::BaseDbproxy::Del(const std::string &msg_name, const std::string &cond, ::uint64 num_key, const std::string &str_key)
+bool db::BaseDbproxy::Del(const std::string &msg_name, ::uint64 num_key, const std::string &str_key)
 {
 	ReqDelData req;
 	req.set_msg_name(msg_name);
-	req.set_cond(cond);
 	req.set_num_key(num_key);
 	req.set_str_key(str_key);
 	return m_con.Send(CMD_DEL, req);

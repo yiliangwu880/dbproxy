@@ -22,6 +22,7 @@ public:
 	//获取主键， 如果有，会从 num_key str_key其中之一返回.
 	//@return false表示没有
 	static bool GetMsgMainKeyVal(const google::protobuf::Message &msg, ::uint64 &num_key, std::string &str_key);
+	static std::string GetMsgMainKeyName(const google::protobuf::Descriptor &des);
 
 	//unique ptr返回，想泄漏都难。
 	static std::unique_ptr<google::protobuf::Message> CreateMessage(const std::string &msg_name);

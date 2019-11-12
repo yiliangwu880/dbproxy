@@ -132,6 +132,26 @@ bool ProtoUtil::GetMsgMainKeyVal(const google::protobuf::Message &msg, ::uint64 
 	return false;
 }
 
+std::string ProtoUtil::GetMsgMainKeyName(const google::protobuf::Descriptor &des)
+{
+	int cnt = des.field_count();
+	L_COND_F(cnt > 0, "no field");
+	for (int i = 0; i < cnt; i++)
+	{
+		const FieldDescriptor* field = des.field(i);
+		L_COND_F(field);
+		KeyType key_type;
+		GetFieldKeyOpt(des, field->name(), key_type);
+		if (db::K_MAIN_KEY != key_type)
+		{
+			continue;
+		}
+		//is main key
+		return field->name();
+	}
+	return "";
+}
+
 std::unique_ptr<Message> ProtoUtil::CreateMessage(const std::string &msg_name)
 {
 	unique_ptr<Message> p;

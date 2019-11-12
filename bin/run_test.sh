@@ -39,148 +39,53 @@ function Restart()
 
 function Init()
 {
-	#复制执行文件
-	cp acc_svr ./svr1 -rf
-	cp acc_svr ./svr2 -rf
-	cp acc_svr ./svr3 -rf
-	cp test_combine ./f_test_combine -rf
-	cp test_2combine ./f_test_2combine -rf
-	cp test_add_acc ./f_test_add_acc -rf
-	cp test_svr_revert ./f_test_svr_revert -rf
-	
 	rm error.txt
 
 	#remove all old log.
 	all_fold_name_list=(
-	f_test_combine
-	f_test_2combine
-	f_test_add_acc
-	svr1
-	svr2
-	svr3
+	dbproxy_svr
+	test_mysql
 	)
     for v in ${all_fold_name_list[@]} ;do
 		echo $v
 		rm ./${v}/OutLog.txt
 		rm ./${v}/svr_util_log.txt
+		rm ./${v}/lc_log.txt
     done
 }
 
 
-function clear()
+function test_mysql()
 {
-	KillProcess "acc_svr"
-}
-
-function test_combine()
-{
-	KillProcess "acc_svr"
+	KillProcess "dbproxy_svr"
+	KillProcess "test_mysql"
 	sleep 1
-	cd svr1
-	./acc_svr 
-	cd -
-	cd svr2
-	./acc_svr 
-	cd -
-	cd svr3
-	./acc_svr 
-	cd -
-	
-	sleep 1
-	
-	echo start test_combine
-	cd f_test_combine
-	./test_combine > OutLog.txt
+	cd dbproxy_svr
+	./dbproxy_svr 
 	cd -
 	sleep 1
 	
-	KillProcess "./acc_svr"
-	echo CombineTest end
-	
-	grep "ERROR\|error" ./f_test_combine/OutLog.txt >>  error.txt  #追加
-	grep "ERROR\|error" ./svr1/svr_util_log.txt >>  error.txt 
-	grep "ERROR\|error" ./svr2/svr_util_log.txt >>  error.txt 
-	grep "ERROR\|error" ./svr3/svr_util_log.txt >>  error.txt 
-}
-
-function test_2combine()
-{
-	KillProcess "acc_svr"
-	sleep 1
-	cd svr1
-	./acc_svr 
-	cd -
-	
-	sleep 1
-	echo start test_2combine
-	cd f_test_2combine
-	./test_2combine > OutLog.txt
+	echo start test_mysql
+	cd test_mysql
+	./test_mysql > OutLog.txt
 	cd -
 	sleep 1
 	
-	KillProcess "./acc_svr"
-	echo 2CombineTest end
+	KillProcess "./dbproxy_svr"
+	echo test_mysql end
 	
-	grep "ERROR\|error" ./f_test_2combine/OutLog.txt >>  error.txt  #追加
-	grep "ERROR\|error" ./svr1/svr_util_log.txt >>  error.txt 
+	grep "ERROR\|error" ./test_mysql/OutLog.txt >>  error.txt  #追加
+	grep "ERROR\|error" ./dbproxy_svr/svr_util_log.txt >>  error.txt 
 }
 
 
-function test_add_acc()
-{
-	KillProcess "acc_svr"
-	sleep 1
-	cd svr1
-	./acc_svr 
-	cd -
-	cd svr2
-	./acc_svr 
-	cd -
-	
-	sleep 1
-	echo start test_add_acc
-	cd f_test_add_acc
-	./test_add_acc > OutLog.txt
-	cd -
-
-	KillProcess "./acc_svr"
-	echo test_add_acc end
-	
-	grep "ERROR\|error" ./f_test_add_acc/OutLog.txt >>  error.txt  #追加
-	grep "ERROR\|error" ./svr1/svr_util_log.txt >>  error.txt 
-	grep "ERROR\|error" ./svr2/svr_util_log.txt >>  error.txt 
-}
-
-function test_svr_revert()
-{
-	KillProcess "acc_svr"
-	sleep 1
-	cd svr1
-	./acc_svr 
-	cd -
-	
-	sleep 1
-	echo start test_svr_revert
-	cd f_test_svr_revert
-	./test_svr_revert > OutLog.txt
-	cd -
-
-	KillProcess "./acc_svr"
-	echo test_svr_revert end
-	
-	grep "ERROR\|error" ./f_test_svr_revert/OutLog.txt >>  error.txt  #追加
-	grep "ERROR\|error" ./svr1/svr_util_log.txt >>  error.txt 
-}
 #main follow
 ########################################################################################################
 #Init
 if [ $# -lt 1 ];then
 	echo "run all"
 	Init
-	test_2combine
-	test_svr_revert
-	test_combine
-	test_add_acc
+	test_mysql
 else
     echo "run submodue" $1
 	Init

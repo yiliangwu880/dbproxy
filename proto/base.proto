@@ -52,7 +52,7 @@ enum Cmd
 	CMD_UPDATE        =3; //ReqUpdateData
 	CMD_GET           =4; //ReqGetData
 	CMD_DEL           =5; //ReqDelData
-	CMD_SQL           =6; //ReqSql
+	CMD_SQL           =6; //ReqSql  只合适mysql用，执行sql语句
 }
 
 message ReqInitTable
@@ -105,10 +105,9 @@ message RspGetData
 
 message ReqDelData
 {
-	string		msg_name  = 1;
-	string		cond      = 2;		
-	uint64		num_key	  = 4;	 //数据的主键, 可选用， 不影响操作
-	string		str_key	  = 5;   //数据的主键, 可选用， 不影响操作
+	string		msg_name  = 1;	
+	uint64		num_key	  = 4;	 //数据的主键, 可选用
+	string		str_key	  = 5;   //数据的主键, 可选用
 }
 message RspDelData
 {

@@ -26,7 +26,7 @@ class BaseApp
 {
 public:
 	void Start(int argc, char* argv[], const string &app_name, bool is_daemon);
-	virtual void OnStart() = 0;
+	virtual bool OnStart() = 0;
 	void Stop();
 private:
 	static void OnExitProccess();
@@ -51,7 +51,11 @@ void BaseApp::Start(int argc, char* argv[], const string &app_name, bool is_daem
 
 	EventMgr::Obj().Init(&MyLcLog::Obj());
 
-	OnStart();
+	if (!OnStart())
+	{
+		L_INFO("start fail");
+		return;
+	}
 
 	EventMgr::Obj().Dispatch();
 	L_INFO("main end");
@@ -72,12 +76,15 @@ void BaseApp::OnExitProccess()
 class MyApp: public BaseApp
 {
 public:
-	virtual void OnStart() override
+	virtual bool OnStart() override
 	{
 		const Cfg &cfg = CfgMgr::Obj().GetCfg();
-		DbConMgr::Obj().Init(cfg);
+		if (!DbConMgr::Obj().Init(cfg))
+		{
+			return false;
+		}
 		L_INFO("dbproxy_svr svr addr:%s %d", cfg.ip.c_str(), cfg.port);
-		DbServer::Obj().Init(cfg.port, cfg.ip.c_str());
+		return DbServer::Obj().Init(cfg.port, cfg.ip.c_str());
 	}
 
 private:

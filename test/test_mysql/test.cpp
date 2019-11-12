@@ -26,11 +26,15 @@ namespace
 		enum State
 		{
 			WAIT_CONNECT,
+			WAIT_DROP_TABLE, //删除上次测试的table
 			WAIT_INIT_TALBE,
 			WAIT_INSERT,
 			WAIT_UPDATE,
 			WAIT_GET,
 			WAIT_DEL,
+			WAIT_SQL_INSERT,
+			WAIT_GET_SQL_INSERT,
+			WAIT_SQL_DEL,
 		};
 		State m_state;
 		TestTable m_msg;
@@ -40,6 +44,7 @@ namespace
 		DbMgr();
 
 		void Start();
+		void StartInitTable();
 
 		virtual void OnCon();
 		virtual void OnDiscon();
@@ -66,15 +71,23 @@ namespace
 		Connect(CfgMgr::Obj().dbproxy_svr_ip, CfgMgr::Obj().dbproxy_svr_port);
 	}
 
-	void DbMgr::OnCon()
+
+	void DbMgr::StartInitTable()
 	{
-		UNIT_ASSERT(m_state == WAIT_CONNECT);
 		m_state = WAIT_INIT_TALBE;
 		ReqInitTable req;
 		//TestTable a;
 		req.add_msg_name("TestTable");
 		req.add_msg_name("TTT3");
 		InitTable(req);
+	}
+
+	void DbMgr::OnCon()
+	{
+		UNIT_ASSERT(m_state == WAIT_CONNECT);
+		m_state = WAIT_DROP_TABLE;
+		ExecuteSql("DROP TABLE TTT3");
+		ExecuteSql("DROP TABLE TestTable");
 	}
 
 
@@ -167,54 +180,99 @@ namespace
 	void DbMgr::OnRspGet(const db::RspGetData &rsp)
 	{
 		UNIT_INFO("OnRspGet");
-		UNIT_ASSERT(WAIT_GET == m_state);
-		UNIT_ASSERT(rsp.data_size() == 1);
-		UNIT_ASSERT(rsp.is_last());
-		if (rsp.msg_name() == "TTT3")
+		if (WAIT_GET == m_state)
 		{
 			UNIT_ASSERT(rsp.data_size() == 1);
-			TTT3 rsp_msg;
-			bool r = rsp_msg.ParseFromString(rsp.data(0));
-			UNIT_ASSERT(r);
-			UNIT_ASSERT(rsp_msg.name() == m_t.name());
+			UNIT_ASSERT(rsp.is_last());
+			if (rsp.msg_name() == "TTT3")
+			{
+				UNIT_ASSERT(rsp.data_size() == 1);
+				TTT3 rsp_msg;
+				bool r = rsp_msg.ParseFromString(rsp.data(0));
+				UNIT_ASSERT(r);
+				UNIT_ASSERT(rsp_msg.name() == m_t.name());
 
-			m_state = WAIT_DEL;
-			Del<TestTable>("id=1", 1, "a");
-			Del<TTT3>("name='abc'", 1, "a");
+				m_state = WAIT_DEL;
+				Del<TestTable>(1);
+				Del<TTT3>("abc");
+			}
+			else if (rsp.msg_name() == "TestTable")
+			{
+				UNIT_ASSERT(rsp.data_size() == 1);
+				TestTable rsp_msg;
+				bool r = rsp_msg.ParseFromString(rsp.data(0));
+				UNIT_ASSERT(r);
+				UNIT_ASSERT(rsp_msg.id() == m_msg.id());
+				string s = m_msg.SerializeAsString();
+				UNIT_ASSERT(s == rsp.data(0));//所有值一样。
+			}
 		}
-		else if (rsp.msg_name() == "TestTable")
+		else if (WAIT_GET_SQL_INSERT == m_state)
 		{
 			UNIT_ASSERT(rsp.data_size() == 1);
+			UNIT_ASSERT(rsp.is_last());
+			UNIT_ASSERT(rsp.msg_name() == "TestTable");
 			TestTable rsp_msg;
 			bool r = rsp_msg.ParseFromString(rsp.data(0));
 			UNIT_ASSERT(r);
-			UNIT_ASSERT(rsp_msg.id() == m_msg.id());
-			string s = m_msg.SerializeAsString();
-			UNIT_ASSERT(s == rsp.data(0));//所有值一样。
+			UNIT_ASSERT(rsp_msg.id() == 2);
+			UNIT_ASSERT(rsp_msg.name_64() == 11);
+			UNIT_INFO("get sql insert del end");
+			m_state = WAIT_SQL_DEL;
+			ExecuteSql("delete from TestTable where id=2");
 		}
+		else
+		{
+			UNIT_ASSERT(false);
+		}
+
 	}
 
 	void DbMgr::OnRspDel(const db::RspDelData &rsp)
 	{
 		UNIT_INFO("OnRspDel");
 		UNIT_ASSERT(WAIT_DEL == m_state);
-		UNIT_ASSERT(rsp.num_key() == 1);
-		UNIT_ASSERT(rsp.str_key() == "a");
 		UNIT_ASSERT(rsp.del_num() == 1);
 		if (rsp.msg_name() == "TestTable")
 		{
-
+			UNIT_ASSERT(rsp.num_key() == 1);
+			UNIT_ASSERT(rsp.str_key() == "");
 		}
 		else if (rsp.msg_name() == "TTT3")
 		{
-
 			UNIT_INFO("del end");
+			UNIT_ASSERT(rsp.num_key() == 0);
+			UNIT_ASSERT(rsp.str_key() == "abc");
+			m_state = WAIT_SQL_INSERT;
+			ExecuteSql("INSERT INTO `TestTable` VALUES ('2', null, '11', null, null, null, null, null)");
 		}
 	}
 
 	void DbMgr::OnRspSql(bool is_ok)
 	{
-
+		static uint32 drop_cnt = 0;
+		if(WAIT_SQL_INSERT == m_state)
+		{
+			UNIT_ASSERT(is_ok);
+			m_state = WAIT_GET_SQL_INSERT;
+			UNIT_INFO("start get sql insert data");
+			Get<TestTable>("id=2");
+		}
+		else if (WAIT_SQL_DEL == m_state)
+		{
+			UNIT_ASSERT(is_ok);
+			UNIT_INFO("sql del end");
+			EventMgr::Obj().StopDispatch();
+		}
+		else if (WAIT_DROP_TABLE == m_state)
+		{
+			UNIT_INFO("rsp sql drop table");
+			drop_cnt++;
+			if (drop_cnt == 2)
+			{
+				StartInitTable();
+			}
+		}
 	}
 
 	class TC : public lc::ClientCon

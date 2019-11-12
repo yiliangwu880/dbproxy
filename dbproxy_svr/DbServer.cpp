@@ -84,6 +84,17 @@ void InnerSvrCon::Handle_CMD_DEL(const char *msg, uint16 msg_len)
 	Send(rsp);
 }
 
+void InnerSvrCon::Handle_CMD_SQL(const char *msg, uint16 msg_len)
+{
+	IDbCon &db_con = DbConMgr::Obj().GetCon();
+	ReqSql req;
+	L_COND(req.ParseFromArray(msg, msg_len), "msg parse fail");
+
+	RspSql rsp;
+	rsp.set_is_ok(db_con.ExecuteSql(req.exe_str()));
+	Send(rsp);
+}
+
 void InnerSvrCon::OnRecv(const MsgPack &msg_pack)
 {
 	if (msg_pack.len < sizeof(db::Cmd))
@@ -102,6 +113,7 @@ void InnerSvrCon::OnRecv(const MsgPack &msg_pack)
 	case CMD_UPDATE    : Handle_CMD_UPDATE(msg, msg_len); return;
 	case CMD_GET       : Handle_CMD_GET(msg, msg_len); return;
 	case CMD_DEL       : Handle_CMD_DEL(msg, msg_len); return;
+	case CMD_SQL       : Handle_CMD_SQL(msg, msg_len); return;
 	default:
 		L_WARN("illegal msg. cmd=%d", m_cur_cmd); return;
 		break;

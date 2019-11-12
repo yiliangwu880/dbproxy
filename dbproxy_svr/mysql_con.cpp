@@ -343,6 +343,7 @@ bool MysqlCon::ConnectDb(const Cfg &cfg)
 		m_con = driver->connect(connection_properties);
 		m_con->setSchema(mysql_db.db_name);
 		L_DEBUG("connect mysql db ok");
+		
 		return true;
 	}
 	catch (sql::SQLException &e) {
@@ -700,7 +701,6 @@ bool MysqlCon::Del(const db::ReqDelData &req, db::RspDelData &rsp)
 	rsp.set_num_key(req.num_key());
 	rsp.set_str_key(req.str_key());
 	L_COND_F(m_con);
-	L_COND_F(!req.cond().empty());
 
 	const Descriptor* des = DescriptorPool::generated_pool()->FindMessageTypeByName(req.msg_name());
 	if (nullptr == des)
@@ -712,7 +712,26 @@ bool MysqlCon::Del(const db::ReqDelData &req, db::RspDelData &rsp)
 		string sql_str = "delete from ";
 		sql_str += des->name();
 		sql_str += " where ";
-		sql_str += req.cond();
+
+		{//build cond
+			string key_name = ProtoUtil::GetMsgMainKeyName(*des);
+			if (key_name.empty())
+			{
+				L_WARN("illegal message %s. no main key. ", req.msg_name().c_str());
+				return false;
+			}
+
+			sql_str += key_name;
+			sql_str += "=";
+			if (req.num_key() != 0)
+			{
+				sql_str += StringTool::NumToStr(req.num_key());
+			}
+			else
+			{
+				sql_str += "'"+req.str_key()+"'";
+			}
+		}
 
 		L_DEBUG("sql=%s", sql_str.c_str());
 		unique_ptr<sql::Statement> stmt(m_con->createStatement());
@@ -737,12 +756,6 @@ bool MysqlCon::ExecuteSql(const std::string &sql_str)
 	try {
 		unique_ptr< sql::Statement > stmt(m_con->createStatement());
 		stmt->execute(sql_str);
-		//int affect_row = stmt->getUpdateCount(); //这个判断执行有没有作用不行
-		//if (affect_row == 0)
-		//{
-		//	LOG_ERROR("execute sql fail %d [%s]", r, sql_str.c_str());
-		//	return false;
-		//}
 		return true;
 	}
 	catch (sql::SQLException &e) {

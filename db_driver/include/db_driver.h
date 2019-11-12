@@ -30,7 +30,7 @@ namespace db {
 
 	class DbClientCon;
 
-	//外观模式，db driver 接口
+	//db driver 接口
 	class BaseDbproxy 
 	{
 	private:
@@ -46,14 +46,12 @@ namespace db {
 		bool Insert(const google::protobuf::Message &msg);
 		//更新数据，没填值的字段不会更新
 		bool Update(const google::protobuf::Message &msg);
-
 		template<class Msg>
 		bool Get(const std::string &cond, uint32 limit_num=1);
-
-		//@num_key 响应回调用，不影响操作
-		//@str_key 响应回调用，不影响操作
 		template<class Msg>
-		bool Del(const std::string &cond, ::uint64 num_key=0, std::string str_key="");
+		bool Del(::uint64 num_key);
+		template<class Msg>
+		bool Del(std::string str_key);
 		//执行mysql sql语句
 		bool ExecuteSql(const std::string &sql_str);
 
@@ -70,19 +68,29 @@ namespace db {
 
 	private:
 		bool Get(const std::string &msg_name, const std::string &cond, uint32 limit_num);
-		bool Del(const std::string &msg_name, const std::string &cond, ::uint64 num_key, const std::string &str_key);
+		bool Del(const std::string &msg_name, ::uint64 num_key, const std::string &str_key);
 	};
 
 	template<class Msg>
-	bool db::BaseDbproxy::Del(const std::string &cond, ::uint64 num_key/*=0*/, std::string str_key/*=""*/)
+	bool db::BaseDbproxy::Del(std::string str_key)
 	{
 		auto des = Msg::descriptor();
-		if (nullptr == des) { 
-			return false; 
+		if (nullptr == des) {
+			return false;
 		}
-		return Del(des->full_name(), cond, num_key, str_key);
-
+		return Del(des->full_name(), 0, str_key);
 	}
+
+	template<class Msg>
+	bool db::BaseDbproxy::Del(::uint64 num_key)
+	{
+		auto des = Msg::descriptor();
+		if (nullptr == des) {
+			return false;
+		}
+		return Del(des->full_name(), num_key, "");
+	}
+
 
 	template<class Msg>
 	bool db::BaseDbproxy::Get(const std::string &cond, uint32 limit_num)

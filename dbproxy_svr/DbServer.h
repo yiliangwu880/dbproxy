@@ -11,6 +11,7 @@ public:
 	void Handle_CMD_UPDATE(const char *msg, uint16 msg_len);
 	void Handle_CMD_GET(const char *msg, uint16 msg_len);
 	void Handle_CMD_DEL(const char *msg, uint16 msg_len);
+	void Handle_CMD_SQL(const char *msg, uint16 msg_len);
 
 	void Send(db::Cmd cmd, const google::protobuf::Message &msg);
 	//用最近接收消息号，发送

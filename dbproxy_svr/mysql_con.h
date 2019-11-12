@@ -10,6 +10,9 @@
 
 class MysqlCon : public IDbCon
 {
+private:
+	sql::Connection* m_con = nullptr;
+
 public:
 	virtual ~MysqlCon();
 
@@ -33,6 +36,4 @@ private:
 	void CreateSelectSql(const db::ReqGetData &req, const std::string &table_name, std::string &sql_str);
 	std::string GetCreateTypeStr(google::protobuf::FieldDescriptor::Type t, bool is_unique);
 
-private:
-	sql::Connection* m_con = nullptr;
 };
