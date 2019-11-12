@@ -39,4 +39,20 @@ message TTT3
 	string t23 = 32;
 }
 
+message TTT1
+{
+	uint64 id = 1[(db.OptKey)=K_MAIN_KEY];	
+	uint32 t = 2;
+	string t23 = 32;
+	TestEnum name_enum = 4;
+}
+
+
+message TTT2
+{
+	string id = 1[(db.OptKey)=K_MAIN_KEY];	
+	uint32 t = 2;
+	SubMsg sub_msg = 3;
+	string t23 = 32;
+}
 

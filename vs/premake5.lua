@@ -62,6 +62,18 @@ Project "test_mysql"
 		"../test/com/**", 
 		"../test/test_mysql/*.txt", 
 	}
+	
+Project "test_leak"
+	IncludeFile { 
+		"../external/",
+		"../external/protobuf/include/",
+		"../proto/",
+	}
+	files {
+		"../test/test_leak/**", 
+		"../test/com/**", 
+		"../test/test_leak/*.txt", 
+	}
 
 
 
