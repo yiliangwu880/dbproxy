@@ -48,7 +48,7 @@ namespace db {
 		bool Update(const google::protobuf::Message &msg);
 
 		template<class Msg>
-		bool Get(const std::string &cond, uint32 limit_num);
+		bool Get(const std::string &cond, uint32 limit_num=1);
 
 		//@num_key 响应回调用，不影响操作
 		//@str_key 响应回调用，不影响操作
@@ -77,7 +77,9 @@ namespace db {
 	bool db::BaseDbproxy::Del(const std::string &cond, ::uint64 num_key/*=0*/, std::string str_key/*=""*/)
 	{
 		auto des = Msg::descriptor();
-		L_COND_F(des);
+		if (nullptr == des) { 
+			return false; 
+		}
 		return Del(des->full_name(), cond, num_key, str_key);
 
 	}
@@ -86,7 +88,9 @@ namespace db {
 	bool db::BaseDbproxy::Get(const std::string &cond, uint32 limit_num)
 	{
 		auto des = Msg::descriptor();
-		L_COND_F(des);
+		if (nullptr == des) {
+			return false;
+		}
 		return Get(des->full_name(), cond, limit_num);
 	}
 

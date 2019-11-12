@@ -29,6 +29,8 @@ namespace
 			WAIT_INIT_TALBE,
 			WAIT_INSERT,
 			WAIT_UPDATE,
+			WAIT_GET,
+			WAIT_DEL,
 		};
 		State m_state;
 		TestTable m_msg;
@@ -98,11 +100,12 @@ namespace
 			Insert(m_msg);
 		}
 		{
+			m_sub.set_id(1);
 			m_sub.set_name_enum(T1);
 			m_sub.set_name_bool(true);
 
 			m_t.set_id(1);
-			m_t.set_name("a");
+			m_t.set_name("abc");
 			m_t.mutable_sub_msg()->CopyFrom(m_sub);
 			m_t.set_t23("a");
 			Insert(m_t);
@@ -125,10 +128,13 @@ namespace
 				Update(m_msg);
 			}
 			{
+				m_sub.set_id(2);
 				m_sub.set_name_enum(T2);
+				m_sub.set_name_bool(false);
 				m_t.set_t23("b");
 				Update(m_t);
 			}
+
 
 		}
 		else if (rsp.msg_name() == "TestTable")
@@ -147,7 +153,10 @@ namespace
 		if (rsp.msg_name() == "TTT3")
 		{
 			UNIT_ASSERT(rsp.str_key() == m_t.name());
-
+			m_state = WAIT_GET;
+			UNIT_INFO("start get data");
+			Get<TestTable>("id=1");
+			Get<TTT3>("name='abc'");
 		}
 		else if (rsp.msg_name() == "TestTable")
 		{
@@ -157,12 +166,50 @@ namespace
 
 	void DbMgr::OnRspGet(const db::RspGetData &rsp)
 	{
+		UNIT_INFO("OnRspGet");
+		UNIT_ASSERT(WAIT_GET == m_state);
+		UNIT_ASSERT(rsp.data_size() == 1);
+		UNIT_ASSERT(rsp.is_last());
+		if (rsp.msg_name() == "TTT3")
+		{
+			UNIT_ASSERT(rsp.data_size() == 1);
+			TTT3 rsp_msg;
+			bool r = rsp_msg.ParseFromString(rsp.data(0));
+			UNIT_ASSERT(r);
+			UNIT_ASSERT(rsp_msg.name() == m_t.name());
 
+			m_state = WAIT_DEL;
+			Del<TestTable>("id=1", 1, "a");
+			Del<TTT3>("name='abc'", 1, "a");
+		}
+		else if (rsp.msg_name() == "TestTable")
+		{
+			UNIT_ASSERT(rsp.data_size() == 1);
+			TestTable rsp_msg;
+			bool r = rsp_msg.ParseFromString(rsp.data(0));
+			UNIT_ASSERT(r);
+			UNIT_ASSERT(rsp_msg.id() == m_msg.id());
+			string s = m_msg.SerializeAsString();
+			UNIT_ASSERT(s == rsp.data(0));//所有值一样。
+		}
 	}
 
 	void DbMgr::OnRspDel(const db::RspDelData &rsp)
 	{
+		UNIT_INFO("OnRspDel");
+		UNIT_ASSERT(WAIT_DEL == m_state);
+		UNIT_ASSERT(rsp.num_key() == 1);
+		UNIT_ASSERT(rsp.str_key() == "a");
+		UNIT_ASSERT(rsp.del_num() == 1);
+		if (rsp.msg_name() == "TestTable")
+		{
 
+		}
+		else if (rsp.msg_name() == "TTT3")
+		{
+
+			UNIT_INFO("del end");
+		}
 	}
 
 	void DbMgr::OnRspSql(bool is_ok)

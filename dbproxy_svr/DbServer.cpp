@@ -70,9 +70,7 @@ void InnerSvrCon::Handle_CMD_GET(const char *msg, uint16 msg_len)
 	IDbCon &db_con = DbConMgr::Obj().GetCon();
 	ReqGetData req;
 	L_COND(req.ParseFromArray(msg, msg_len), "msg parse fail");
-	RspGetData rsp;
-	db_con.Get(req, rsp);
-	Send(rsp);
+	db_con.Get(req, *this);
 }
 
 void InnerSvrCon::Handle_CMD_DEL(const char *msg, uint16 msg_len)
@@ -80,17 +78,8 @@ void InnerSvrCon::Handle_CMD_DEL(const char *msg, uint16 msg_len)
 	IDbCon &db_con = DbConMgr::Obj().GetCon();
 	ReqDelData req;
 	L_COND(req.ParseFromArray(msg, msg_len), "msg parse fail");
+
 	RspDelData rsp;
-	UINT64 num_key;
-	string str_key;
-	if (!ProtoUtil::GetMsgMainKeyVal(req, num_key, str_key))
-	{
-		L_WARN("illegal message %s. no main key. ", req.msg_name().c_str());
-		Send(rsp);
-		return;
-	}
-	rsp.set_num_key(num_key);
-	rsp.set_str_key(str_key);
 	db_con.Del(req, rsp);
 	Send(rsp);
 }

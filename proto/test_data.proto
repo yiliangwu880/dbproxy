@@ -25,6 +25,7 @@ message TestTable
 
 message SubMsg
 {
+	uint32			id = 2;	
 	TestEnum		name_enum = 133;	
 	bool			name_bool = 4;	
 }

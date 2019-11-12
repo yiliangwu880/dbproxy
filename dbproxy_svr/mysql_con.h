@@ -18,7 +18,7 @@ public:
 	virtual bool InitTable(const db::ReqInitTable &req, db::RspInitTable &rsp) override; //创建表， 检查表是否非法
 	virtual bool Insert(const db::ReqInsertData &req, ::uint64 &num_key, std::string &str_key) override;
 	virtual bool Update(const db::ReqUpdateData &req, ::uint64 &num_key, std::string &str_key) override;
-	virtual bool Get(const db::ReqGetData &req, db::RspGetData &rsp) override;
+	virtual bool Get(const db::ReqGetData &req, InnerSvrCon &con) override;
 	virtual bool Del(const db::ReqDelData &req, db::RspDelData &rsp) override;
 	virtual bool ExecuteSql(const std::string &sql_str) override;
 

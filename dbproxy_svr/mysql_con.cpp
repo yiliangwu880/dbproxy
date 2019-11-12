@@ -6,6 +6,8 @@
 #include "parser.h"
 #include "mysql_con.h"
 #include "svr_util/include/string_tool.h"
+#include "DbServer.h"
+
 using namespace su;
 using namespace lc;
 using namespace std;
@@ -276,12 +278,21 @@ namespace
 			string s = chiledMsg->SerializeAsString();
 			pstmt.setString(idx, s);
 
+			//{
+			//	char str[MAX_SQL_STR_SIZE];
+			//	bool r = chiledMsg->SerializeToArray(str, sizeof(str));
+			//	if (!r)
+			//	{
+			//		L_ERROR("SerializeToArray fail");
+			//		break;
+			//	}
 
-			//DataBuf buffer;
-			//std::istream blobStream(&buffer);
-			//buffer.InitBuf(str, chiledMsg->ByteSize());
-			//blobStream.rdbuf(&buffer);
-			//pstmt.setBlob(idx, &blobStream);
+			//	DataBuf buffer;
+			//	std::istream blobStream(&buffer);
+			//	buffer.InitBuf(str, chiledMsg->ByteSize());
+			//	blobStream.rdbuf(&buffer);
+			//	pstmt.setBlob(idx, &blobStream);
+			//}
 			break;
 		}
 		} //end switch (field.type())
@@ -618,11 +629,9 @@ bool MysqlCon::CreateUpdateSql(const google::protobuf::Message &msg, std::string
 	return true;
 }
 
-bool MysqlCon::Get(const db::ReqGetData &req, db::RspGetData &rsp)
+bool MysqlCon::Get(const db::ReqGetData &req, InnerSvrCon &con)
 {
-	L_COND_F(m_con);
-	rsp.Clear();
-	rsp.set_msg_name(req.msg_name());
+	L_COND_F(m_con); 
 	unique_ptr<google::protobuf::Message> msg = ProtoUtil::CreateMessage(req.msg_name());
 	if (nullptr == msg)
 	{
@@ -633,6 +642,7 @@ bool MysqlCon::Get(const db::ReqGetData &req, db::RspGetData &rsp)
 	L_COND_F(des);
 
 	try {
+
 		string sql_str;
 		CreateSelectSql(req, des->name(), sql_str);
 //		L_DEBUG("select sql [%s]", sql_str.c_str());
@@ -642,6 +652,9 @@ bool MysqlCon::Get(const db::ReqGetData &req, db::RspGetData &rsp)
 		int row_num = 0;
 		do
 		{
+			db::RspGetData rsp;
+			rsp.set_msg_name(req.msg_name());
+
 			unique_ptr<sql::ResultSet> ret(stmt->getResultSet());
 			if (0 == row_num && nullptr == ret) //一个数据都没有
 			{
@@ -663,8 +676,15 @@ bool MysqlCon::Get(const db::ReqGetData &req, db::RspGetData &rsp)
 				rsp.add_data(msg->SerializeAsString());
 			}
 			row_num++;
-			rsp.set_is_last(ret->isLast());
-		} while (stmt->getMoreResults());
+
+			if (!stmt->getMoreResults())
+			{
+				rsp.set_is_last(true);
+				con.Send(rsp);
+				break;
+			}
+			con.Send(rsp);
+		} while(true);
 		return true;
 	}
 	catch (sql::SQLException &e) {
@@ -694,6 +714,7 @@ bool MysqlCon::Del(const db::ReqDelData &req, db::RspDelData &rsp)
 		sql_str += " where ";
 		sql_str += req.cond();
 
+		L_DEBUG("sql=%s", sql_str.c_str());
 		unique_ptr<sql::Statement> stmt(m_con->createStatement());
 		stmt->execute(sql_str);
 		int affect_row = stmt->getUpdateCount();
