@@ -36,4 +36,8 @@ vs浏览代码：
 	external/protobuf-3.10.1 ==protobuf源码
 
 使用方法：
-
+	编译通过本项目。
+	根据你的业务，用proto文件定义存库结构，导出 proto cpp
+	dbproxy_svr 不需要修改代码，但需要加入proto cpp重新编译。
+	svr,就是你的业务服务器。 加入库db_driver（目录db_driver里面有库和头文件），就可以通过请求dbproxy_svr读写db了。
+	详情看：doc.lua

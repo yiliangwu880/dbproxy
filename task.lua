@@ -1,2 +1,2 @@
 
-×ö¼æÈİredis,mongodb
+×ö¼æÈİmongodb
