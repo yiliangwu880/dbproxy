@@ -123,7 +123,7 @@ bool ProtoUtil::GetMsgMainKeyVal(const google::protobuf::Message &msg, ::uint64 
 			str_key = ref->GetString(msg, field);
 			return true;
 		}
-		else//其他一致认为是uint64处理
+		else//鍏朵粬涓�鑷磋涓烘槸uint64澶勭悊
 		{
 			num_key = ref->GetUInt64(msg, field);
 			return true;

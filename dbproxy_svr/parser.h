@@ -1,5 +1,5 @@
 /*
-  ½âÎö²¢´¦Àí svr ,db clientµÄÏûÏ¢¡£
+  è§£æå¹¶å¤„ç† svr ,db clientçš„æ¶ˆæ¯ã€‚
 */
 
 #pragma once
@@ -8,22 +8,22 @@
 class ProtoUtil
 {
 public:
-	//²âÊÔÀı×Ó
+	//æµ‹è¯•ä¾‹å­
 	static void Test();
 
-	//»ñÈ¡×Ö¶ÎÑ¡Ïî
+	//è·å–å­—æ®µé€‰é¡¹
 	static bool GetFieldOpt(const google::protobuf::Descriptor &des, const std::string &field_name, const std::string &opt_name, std::string &opt_value);
 	static bool GetFieldOpt(const google::protobuf::Descriptor &des, const std::string &field_name, const std::string &opt_name, int32 &opt_value);
 	static bool GetFieldOptEnum(const google::protobuf::Descriptor &des, const std::string &field_name, const std::string &opt_name, uint32 &opt_value);
 	static bool GetFieldKeyOpt(const google::protobuf::Descriptor &des, const std::string &field_name, db::KeyType &key_type);
 
-	//»ñÈ¡msgÑ¡Ïî
+	//è·å–msgé€‰é¡¹
 	static bool GetMsgOpt(const google::protobuf::Descriptor &des, const std::string &opt_name, std::string &opt_value);
-	//»ñÈ¡Ö÷¼ü£¬ Èç¹ûÓĞ£¬»á´Ó num_key str_keyÆäÖĞÖ®Ò»·µ»Ø.
-	//@return false±íÊ¾Ã»ÓĞ
+	//è·å–ä¸»é”®ï¼Œ å¦‚æœæœ‰ï¼Œä¼šä» num_key str_keyå…¶ä¸­ä¹‹ä¸€è¿”å›.
+	//@return falseè¡¨ç¤ºæ²¡æœ‰
 	static bool GetMsgMainKeyVal(const google::protobuf::Message &msg, ::uint64 &num_key, std::string &str_key);
 	static std::string GetMsgMainKeyName(const google::protobuf::Descriptor &des);
 
-	//unique ptr·µ»Ø£¬ÏëĞ¹Â©¶¼ÄÑ¡£
+	//unique ptrè¿”å›ï¼Œæƒ³æ³„æ¼éƒ½éš¾ã€‚
 	static std::unique_ptr<google::protobuf::Message> CreateMessage(const std::string &msg_name);
 };

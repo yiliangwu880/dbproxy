@@ -14,7 +14,7 @@ public:
 	void Handle_CMD_SQL(const char *msg, uint16 msg_len);
 
 	void Send(db::Cmd cmd, const google::protobuf::Message &msg);
-	//ÓÃ×î½ü½ÓÊÕÏûÏ¢ºÅ£¬·¢ËÍ
+	//ç”¨æœ€è¿‘æ¥æ”¶æ¶ˆæ¯å·ï¼Œå‘é€
 	void Send(const google::protobuf::Message &msg);
 private:
 	virtual void OnRecv(const lc::MsgPack &msg_pack) override;

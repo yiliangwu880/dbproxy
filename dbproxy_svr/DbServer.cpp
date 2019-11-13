@@ -14,11 +14,11 @@ using UINT64 =::uint64;
 
 namespace
 {
-	//简化解包操作。赋值并移动指针
+	//绠�鍖栬В鍖呮搷浣溿�傝祴鍊煎苟绉诲姩鎸囬拡
 	template<class T>
 	void ParseCp(T &dst, const char *&src)
 	{
-		dst = *(T *)(src); // 类似 dst = *(uint32 *)(src)
+		dst = *(T *)(src); // 绫讳技 dst = *(uint32 *)(src)
 		src = src + sizeof(dst);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- ¹ÜÀíÁ¬½Ódb¿Í»§¶Ë,³éÏó³É£¬¼æÈİmysql£¬ mongodb
+ ç®¡ç†è¿æ¥dbå®¢æˆ·ç«¯,æŠ½è±¡æˆï¼Œå…¼å®¹mysqlï¼Œ mongodb
 */
 
 #pragma once
@@ -13,7 +13,7 @@ public:
 
 	virtual bool ConnectDb(const Cfg &cfg) { return false; };
 
-	virtual bool InitTable(const db::ReqInitTable &req, db::RspInitTable &rsp) {return false;}; //´´½¨±í£¬ ¼ì²é±íÊÇ·ñ·Ç·¨
+	virtual bool InitTable(const db::ReqInitTable &req, db::RspInitTable &rsp) {return false;}; //åˆ›å»ºè¡¨ï¼Œ æ£€æŸ¥è¡¨æ˜¯å¦éæ³•
 	virtual bool Insert(const db::ReqInsertData &req, ::uint64 &num_key, std::string &str_key) { return false; };
 	virtual bool Update(const db::ReqUpdateData &req, ::uint64 &num_key, std::string &str_key) { return false; };
 	virtual bool Get(const db::ReqGetData &req, InnerSvrCon &con) { return false; };
@@ -22,7 +22,7 @@ public:
 
 };
 
-//¹ÜÀíÁ¬½Ódb¿Í»§¶Ë
+//ç®¡ç†è¿æ¥dbå®¢æˆ·ç«¯
 class DbConMgr : public Singleton<DbConMgr>
 {
 

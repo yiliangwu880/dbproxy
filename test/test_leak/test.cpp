@@ -1,6 +1,6 @@
 /*
-����dbproxy_svr�Ƿ����ڴ�й©��
-����������еķ������ԡ�
+测试dbproxy_svr是否又内存泄漏。
+随机长期运行的方法测试。
 */
 
 #include <string>
@@ -28,7 +28,7 @@ namespace
 		enum State
 		{
 			WAIT_CONNECT,
-			WAIT_DROP_TABLE, //ɾ���ϴβ��Ե�table
+			WAIT_DROP_TABLE, //删除上次测试的table
 			WAIT_INIT_TALBE,
 
 			WAIT_RANDOM_END,

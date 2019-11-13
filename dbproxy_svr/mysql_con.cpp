@@ -278,6 +278,7 @@ namespace
 			string s = chiledMsg->SerializeAsString();
 			pstmt.setString(idx, s);
 
+			//åˆ«åˆ ï¼Œå¦‚æœå­—ç¬¦å¤„ç†ä¸äº†çš„å­—ç¬¦ï¼Œå°±ç”¨ä¸‹é¢çš„ã€‚
 			//{
 			//	char str[MAX_SQL_STR_SIZE];
 			//	bool r = chiledMsg->SerializeToArray(str, sizeof(str));
@@ -368,7 +369,7 @@ bool MysqlCon::TryCreateTableSql(const std::string &msg_name, std::string &sql_s
 
 
 	sql_str = "CREATE TABLE IF NOT EXISTS `";
-	sql_str += des->name(); //²»ÓÃ msg_name È¥µôÃüÃû¿Õ¼ä, ÒòÎª±íÃûÓĞ.·ûºÅ»áµ¼ÖÂinsert sqlÓï¾ä²é±íÃûÊ§°Ü
+	sql_str += des->name(); //ä¸ç”¨ msg_name å»æ‰å‘½åç©ºé—´, å› ä¸ºè¡¨åæœ‰.ç¬¦å·ä¼šå¯¼è‡´insert sqlè¯­å¥æŸ¥è¡¨åå¤±è´¥
 	sql_str += "` (";
 	
 	int cnt = des->field_count();
@@ -376,7 +377,7 @@ bool MysqlCon::TryCreateTableSql(const std::string &msg_name, std::string &sql_s
 	VecStr index_key;
 	for (int i = 0; i < cnt; i++)
 	{
-		//Ã¿¸öÓò ×Ö·û´®Ä£°å = "`a` varchar(11) NOT NULL,"
+		//æ¯ä¸ªåŸŸ å­—ç¬¦ä¸²æ¨¡æ¿ = "`a` varchar(11) NOT NULL,"
 		const FieldDescriptor* field = des->field(i);
 		if (nullptr == field)
 		{
@@ -499,7 +500,7 @@ bool MysqlCon::SetField(Message& msg, const FieldDescriptor &field, const sql::R
 				L_ERROR("res.getBlob() fail field.name()=%s", field.name().c_str());
 				return false;
 			}
-			//NULL²»½âÎöÏûÏ¢
+			//NULLä¸è§£ææ¶ˆæ¯
 			if (res.wasNull())
 			{
 				return true;
@@ -513,7 +514,7 @@ bool MysqlCon::SetField(Message& msg, const FieldDescriptor &field, const sql::R
 
 			if (!chiledMsg->ParseFromIstream(inStream.get()))
 			{
-				L_ERROR("½âÎöÊ§°Ü£¡");
+				L_ERROR("è§£æå¤±è´¥ï¼");
 				return false;
 			}
 			break;
@@ -521,7 +522,7 @@ bool MysqlCon::SetField(Message& msg, const FieldDescriptor &field, const sql::R
 		}//end switch (field.type())
 	}
 	catch (sql::InvalidArgumentException e) {
-		//½á¹û¼¯ÖĞÃ»ÓĞ¸Ä×Ö¶Î£¬²»½øĞĞÉèÖÃ
+		//ç»“æœé›†ä¸­æ²¡æœ‰æ”¹å­—æ®µï¼Œä¸è¿›è¡Œè®¾ç½®
 		L_ERROR("can not set filed %s, ", field.name().c_str());
 		L_ERROR("%s, MySQL error code:%d, SQLState:%d", e.what(), e.getErrorCode(), e.getSQLStateCStr());
 		return false;
@@ -596,7 +597,7 @@ bool MysqlCon::CreateUpdateSql(const google::protobuf::Message &msg, std::string
 			{
 				str_key = ref->GetString(msg, field);
 			}
-			else//ÆäËûÒ»ÖÂÈÏÎªÊÇuint64´¦Àí
+			else//å…¶ä»–ä¸€è‡´è®¤ä¸ºæ˜¯uint64å¤„ç†
 			{
 				num_key = ref->GetUInt64(msg, field);
 			}
@@ -619,7 +620,7 @@ bool MysqlCon::CreateUpdateSql(const google::protobuf::Message &msg, std::string
 		str_key = ref->GetString(msg, key_field);
 		snprintf(where, sizeof(where), "WHERE %s='%s'  limit 1", key_field->name().c_str(), str_key.c_str());
 	}
-	else//ÆäËûÒ»ÖÂÈÏÎªÊÇuint64´¦Àí
+	else//å…¶ä»–ä¸€è‡´è®¤ä¸ºæ˜¯uint64å¤„ç†
 	{
 		num_key = ref->GetUInt64(msg, key_field);
 		snprintf(where, sizeof(where), "WHERE %s=%llu  limit 1", key_field->name().c_str(), num_key);
@@ -657,7 +658,7 @@ bool MysqlCon::Get(const db::ReqGetData &req, InnerSvrCon &con)
 			rsp.set_msg_name(req.msg_name());
 
 			unique_ptr<sql::ResultSet> ret(stmt->getResultSet());
-			if (0 == row_num && nullptr == ret) //Ò»¸öÊı¾İ¶¼Ã»ÓĞ
+			if (0 == row_num && nullptr == ret) //ä¸€ä¸ªæ•°æ®éƒ½æ²¡æœ‰
 			{
 				L_ERROR("execute sql fail [%s]", sql_str.c_str());
 				return false;
@@ -775,7 +776,7 @@ bool MysqlCon::CreateInsertSql(const google::protobuf::Message &msg, std::string
 	sql_str += des->name();
 	sql_str += "(";
 
-	//Ñ­»·¿½±´Ãû×Ö
+	//å¾ªç¯æ‹·è´åå­—
 	for (int i = 0; i < count; i++)
 	{
 		const FieldDescriptor* field = des->field(i);

@@ -26,7 +26,7 @@ namespace
 		enum State
 		{
 			WAIT_CONNECT,
-			WAIT_DROP_TABLE, //É¾³ıÉÏ´Î²âÊÔµÄtable
+			WAIT_DROP_TABLE, //åˆ é™¤ä¸Šæ¬¡æµ‹è¯•çš„table
 			WAIT_INIT_TALBE,
 			WAIT_INSERT,
 			WAIT_UPDATE,
@@ -109,7 +109,7 @@ namespace
 			m_msg.set_name_str("a");
 			m_msg.set_name_enum(T1);
 			m_msg.set_name_bool(true);
-			m_msg.set_name_bytes("a", 1);
+			m_msg.set_name_bytes("açœ‹åˆ°äº†", 1);
 			Insert(m_msg);
 		}
 		{
@@ -120,7 +120,7 @@ namespace
 			m_t.set_id(1);
 			m_t.set_name("abc");
 			m_t.mutable_sub_msg()->CopyFrom(m_sub);
-			m_t.set_t23("a");
+			m_t.set_t23("ä¸­æ–‡");
 			Insert(m_t);
 		}
 	}
@@ -204,7 +204,7 @@ namespace
 				UNIT_ASSERT(r);
 				UNIT_ASSERT(rsp_msg.id() == m_msg.id());
 				string s = m_msg.SerializeAsString();
-				UNIT_ASSERT(s == rsp.data(0));//ËùÓĞÖµÒ»Ñù¡£
+				UNIT_ASSERT(s == rsp.data(0));//æ‰€æœ‰å€¼ä¸€æ ·ã€‚
 			}
 		}
 		else if (WAIT_GET_SQL_INSERT == m_state)
@@ -278,15 +278,15 @@ namespace
 	class TC : public lc::ClientCon
 	{
 	public:
-		//Ã¿´Î½ÓÊÕ¶¼ÊÇÍêÕûÏûÏ¢°ü
+		//æ¯æ¬¡æ¥æ”¶éƒ½æ˜¯å®Œæ•´æ¶ˆæ¯åŒ…
 		virtual void OnRecv(const MsgPack &msg){};
 		virtual void OnConnected() {
 			UNIT_INFO("OnConnected");
 		};
 		virtual void OnError(short events) {};
-		//±»¶¯É¾³ı¶ÔÏó»Øµ÷£¬¶Ô·½¶Ï¿ª£¬»òÕßÍøÂç´íÎó
-		//±»µ÷ÓÃµÄÊ±ºò£¬ fd, bufferevent ×ÊÔ´ÒÑ¾­ÊÍ·Å
-		//É¾³ı±¾¶ÔÏó£¬ ²»»á´¥·¢OnDisconnectedÁË
+		//è¢«åŠ¨åˆ é™¤å¯¹è±¡å›è°ƒï¼Œå¯¹æ–¹æ–­å¼€ï¼Œæˆ–è€…ç½‘ç»œé”™è¯¯
+		//è¢«è°ƒç”¨çš„æ—¶å€™ï¼Œ fd, bufferevent èµ„æºå·²ç»é‡Šæ”¾
+		//åˆ é™¤æœ¬å¯¹è±¡ï¼Œ ä¸ä¼šè§¦å‘OnDisconnectedäº†
 		virtual void OnDisconnected() {
 			UNIT_INFO("OnDisconnected");
 		};

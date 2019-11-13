@@ -1,4 +1,4 @@
-//Çı¶¯¾ßÌåÊµÏÖ
+//é©±åŠ¨å…·ä½“å®ç°
 
 #pragma once
 
@@ -13,7 +13,7 @@
 #include "db_driver.h"
 
 namespace db {
-	static const uint32 RE_CON_INTERVAL_SEC = 10; //xÃë³¢ÊÔÖØÁ¬
+	static const uint32 RE_CON_INTERVAL_SEC = 10; //xç§’å°è¯•é‡è¿
 
 	class BaseDbproxy;
 	class DbClientCon : public lc::ClientCon

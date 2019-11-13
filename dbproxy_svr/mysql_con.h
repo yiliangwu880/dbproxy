@@ -1,5 +1,5 @@
 /*
- ¹ÜÀíÁ¬½Ódb¿Í»§¶Ë
+ ç®¡ç†è¿æ¥dbå®¢æˆ·ç«¯
 */
 
 #pragma once
@@ -18,7 +18,7 @@ public:
 
 	virtual bool ConnectDb(const Cfg &cfg) override;
 
-	virtual bool InitTable(const db::ReqInitTable &req, db::RspInitTable &rsp) override; //´´½¨±í£¬ ¼ì²é±íÊÇ·ñ·Ç·¨
+	virtual bool InitTable(const db::ReqInitTable &req, db::RspInitTable &rsp) override; //åˆ›å»ºè¡¨ï¼Œ æ£€æŸ¥è¡¨æ˜¯å¦éæ³•
 	virtual bool Insert(const db::ReqInsertData &req, ::uint64 &num_key, std::string &str_key) override;
 	virtual bool Update(const db::ReqUpdateData &req, ::uint64 &num_key, std::string &str_key) override;
 	virtual bool Get(const db::ReqGetData &req, InnerSvrCon &con) override;

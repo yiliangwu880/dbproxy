@@ -20,7 +20,7 @@ DbConMgr::~DbConMgr()
 
 bool DbConMgr::Init(const Cfg &cfg)
 {
-	//mysql_db ªÚ’ﬂ mongodb_db
+	//mysql_db –õ—í–µ–ø mongodb_db
 	if (cfg.select_db == "mysql_db")
 	{
 		MysqlCon *con = new MysqlCon;
