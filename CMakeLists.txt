@@ -31,7 +31,6 @@ LINK_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/db_driver/lib
   ${PROJECT_SOURCE_DIR}/external/protobuf/lib
   ${PROJECT_SOURCE_DIR}/external/mysql_connector/lib
-  ${PROJECT_SOURCE_DIR}/external/libevent_cpp/External/libevent-2.1.8-stable/out/lib
   ${PROJECT_SOURCE_DIR}/external/svr_util/lib
   ${PROJECT_SOURCE_DIR}/external/libevent_cpp/lib
 

@@ -22,5 +22,5 @@ SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin/${project_name})
 ADD_EXECUTABLE(${project_name} ${SRCS} ${SRCS2} ${SRCS3})
 
 # 设置链接库
-target_link_libraries(${project_name}  db_driver.a svr_util libevent_cpp libprotobuf.a libevent.a)
+target_link_libraries(${project_name}  db_driver.a svr_util libcevent_cpp.a libprotobuf.a )
 

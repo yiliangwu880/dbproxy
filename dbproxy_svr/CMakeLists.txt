@@ -23,5 +23,5 @@ SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/../bin/dbproxy_svr/)
 #ADD_DEPENDENCIES(${project_name} svr_util libevent_cpp)
 
 # 设置链接库
-target_link_libraries(${project_name} svr_util libevent_cpp libevent.a libprotobuf.a libmysqlcppconn-static.a dl)
+target_link_libraries(${project_name} svr_util libcevent_cpp.a libprotobuf.a libmysqlcppconn-static.a dl)
 

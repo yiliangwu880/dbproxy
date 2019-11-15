@@ -20,4 +20,4 @@ ADD_LIBRARY(${project_name} STATIC ${ALL_SRC_FILE} ${ALL_SRC_FILE2} )
 #cotire(base)
 
 # 设置链接库
-target_link_libraries(${project_name} svr_util libevent_cpp libprotobuf.a libevent.a)
+target_link_libraries(${project_name} svr_util libcevent_cpp libprotobuf.a)
