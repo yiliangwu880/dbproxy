@@ -1,3 +1,7 @@
+暂停开发，保留用来参考。
+更好的实现参考 https://github.com/yiliangwu880/CppDbProxy.git
+去掉了protobuf,直接用c++ struct.
+
 简介：
 	db代理服务器,给业务服务器读写db（mysql,mongodb,redis）用。
 	特点：
